@@ -137,7 +137,7 @@ export default async function PublicCardPage({
         {/* Footer */}
         <div className="pt-8 text-center">
           <p className="text-[10px] opacity-40">
-            Powered by <span className="font-semibold">NexusStore</span>
+            Powered by <span className="font-semibold">OpenMag</span>
           </p>
         </div>
       </div>

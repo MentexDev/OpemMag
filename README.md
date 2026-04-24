@@ -1,4 +1,4 @@
-# NexusStore
+# OpenMag
 
 SaaS multi-tenant que permite a cualquier dueño de tienda Shopify ofrecer un programa de embajadoras (afiliadas) con su propia marca, dominio y branding.
 
@@ -9,8 +9,8 @@ SaaS multi-tenant que permite a cualquier dueño de tienda Shopify ofrecer un pr
 ## Arquitectura en 30 segundos
 
 - **Un solo proyecto** Next.js 16 + Supabase, multi-tenant via `tenant_id`.
-- **Routing por host**: `nexusstore.com` = landing, `{slug}.nexusstore.com` = dashboard de la tienda, `admin.nexusstore.com` = super-admin.
-- **3 niveles de usuario**: super-admin (NexusStore), tenant-admin (dueño de tienda), embajadora.
+- **Routing por host**: `openmag.co` = landing, `{slug}.openmag.co` = dashboard de la tienda, `admin.openmag.co` = super-admin.
+- **3 niveles de usuario**: super-admin (OpenMag), tenant-admin (dueño de tienda), embajadora.
 - **Branding dinámico**: cada tienda elige logo + colores, aplicado vía CSS variables.
 - **Shopify per-tenant**: cada tienda guarda su propio dominio + access token (encriptado).
 
@@ -31,7 +31,7 @@ Next.js 16 · TypeScript · Tailwind CSS 4 · Shadcn/ui · Supabase · Shopify A
 ## Empezar a trabajar
 
 ```bash
-cd nexusstore
+cd openmag
 npm install
 cp .env.example .env.local   # configurar variables
 npm run dev

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { encrypt } from "@/lib/crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +29,7 @@ export async function PATCH(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { name, primary_color, accent_color, shopify_domain, shopify_token } = body;
+  const { name, primary_color, accent_color } = body;
 
   const admin = createAdminClient();
 
@@ -47,15 +46,6 @@ export async function PATCH(request: Request) {
   if (name !== undefined) updates.name = name;
   if (primary_color !== undefined) updates.primary_color = primary_color;
   if (accent_color !== undefined) updates.accent_color = accent_color;
-  if (shopify_domain !== undefined) updates.shopify_domain = shopify_domain;
-  if (shopify_token !== undefined && shopify_token) {
-    try {
-      updates.shopify_token = encrypt(shopify_token);
-    } catch (e) {
-      console.error("encrypt error", e);
-      return NextResponse.json({ error: "ENCRYPTION_KEY no configurada en el servidor." }, { status: 500 });
-    }
-  }
 
   const { error } = await admin
     .from("tenants")

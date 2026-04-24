@@ -88,7 +88,7 @@ export default function BillingSection() {
           Suscripción
         </h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Plan, estado y facturación de tu cuenta NexusStore.
+          Plan, estado y facturación de tu cuenta OpenMag.
         </p>
       </div>
 
@@ -96,7 +96,7 @@ export default function BillingSection() {
         <div className="rounded-md border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-xs text-yellow-700 dark:text-yellow-400 flex gap-2">
           <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
           <span>
-            Stripe no está configurado en el servidor. Las suscripciones están en modo de solo lectura. Pídele al administrador de NexusStore que configure <span className="font-mono">STRIPE_SECRET_KEY</span> y los <span className="font-mono">STRIPE_PRICE_*</span>.
+            Stripe no está configurado en el servidor. Las suscripciones están en modo de solo lectura. Pídele al administrador de OpenMag que configure <span className="font-mono">STRIPE_SECRET_KEY</span> y los <span className="font-mono">STRIPE_PRICE_*</span>.
           </span>
         </div>
       )}

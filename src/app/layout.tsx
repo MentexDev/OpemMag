@@ -10,9 +10,9 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "NexusStore — Programa de embajadoras para tu tienda",
+  title: "OpenMag — Programa de embajadoras para tu tienda",
   description:
-    "Lanza tu propio programa de afiliadas con tu marca, dominio y branding. Potenciado por NexusStore.",
+    "Lanza tu propio programa de afiliadas con tu marca, dominio y branding. Potenciado por OpenMag.",
 };
 
 export default function RootLayout({

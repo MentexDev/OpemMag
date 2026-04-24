@@ -49,7 +49,7 @@ export default function LoginPage() {
     <Card>
       <CardHeader className="space-y-1">
         <div className="flex items-center gap-2 mb-2">
-          <span className="font-bold text-lg">NexusStore</span>
+          <span className="font-bold text-lg">OpenMag</span>
         </div>
         <CardTitle className="text-2xl">Bienvenido de vuelta</CardTitle>
         <CardDescription>

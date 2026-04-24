@@ -1,4 +1,4 @@
-# NexusStore
+# OpenMag
 
 > **SaaS multi-tenant de embajadoras para tiendas Shopify.** Cada tienda tiene su propio dashboard con branding personalizado, su API de Shopify, y su propio equipo de embajadoras independiente.
 
@@ -8,13 +8,13 @@
 
 Replicar la experiencia de **NINA-Embajadoras** como una plataforma genérica donde cualquier dueño de tienda Shopify pueda:
 
-1. Registrar su tienda en NexusStore.
+1. Registrar su tienda en OpenMag.
 2. Configurar branding (logo, colores).
 3. Conectar su Shopify (dominio + API).
 4. Invitar/recibir embajadoras independientes.
 5. Sus embajadoras crean revistas, comparten Ficha ID, registran ventas, reciben comisiones.
 
-Cada tienda vive bajo su propio subdominio (`mitienda.nexusstore.com`) con su branding aplicado a todas las páginas (sidebar, ficha pública, revistas, etc.).
+Cada tienda vive bajo su propio subdominio (`mitienda.openmag.co`) con su branding aplicado a todas las páginas (sidebar, ficha pública, revistas, etc.).
 
 ---
 
@@ -38,10 +38,10 @@ Un solo proyecto de Supabase compartido. Cada tabla relevante tiene una columna 
 Middleware de Next.js (`middleware.ts`) lee el header `host`:
 
 ```
-host = "mitienda.nexusstore.com"  →  subdomain = "mitienda"  →  tenantSlug = "mitienda"
+host = "mitienda.openmag.co"  →  subdomain = "mitienda"  →  tenantSlug = "mitienda"
 host = "embajadoras.cliente.com"  →  custom_domain match     →  tenantSlug = "cliente"
-host = "nexusstore.com" / "www.nexusstore.com"  →  landing público de NexusStore
-host = "admin.nexusstore.com"     →  panel super-admin (gestión de tiendas)
+host = "openmag.co" / "www.openmag.co"  →  landing público de OpenMag
+host = "admin.openmag.co"     →  panel super-admin (gestión de tiendas)
 ```
 
 El middleware inyecta el `tenant_id` resuelto en headers o cookies para que el resto de la app lo use al construir queries.
@@ -50,9 +50,9 @@ El middleware inyecta el `tenant_id` resuelto en headers o cookies para que el r
 
 | Nivel | Quién | Dónde | Permisos |
 |---|---|---|---|
-| **Super-admin** (NexusStore) | Nosotros | `admin.nexusstore.com` | Crear/aprobar/suspender tiendas, ver métricas globales, gestionar billing |
-| **Tenant-admin** (dueño de tienda) | El cliente Shopify | `mitienda.nexusstore.com/admin` | Configurar tienda (branding, Shopify API), gestionar sus embajadoras, ver ventas/pagos de su tienda |
-| **Embajadora** | Vendedora del cliente | `mitienda.nexusstore.com` | Misma UX que en NINA-Embajadoras (revista, ficha ID, ventas, ranking, etc.) |
+| **Super-admin** (OpenMag) | Nosotros | `admin.openmag.co` | Crear/aprobar/suspender tiendas, ver métricas globales, gestionar billing |
+| **Tenant-admin** (dueño de tienda) | El cliente Shopify | `mitienda.openmag.co/admin` | Configurar tienda (branding, Shopify API), gestionar sus embajadoras, ver ventas/pagos de su tienda |
+| **Embajadora** | Vendedora del cliente | `mitienda.openmag.co` | Misma UX que en NINA-Embajadoras (revista, ficha ID, ventas, ranking, etc.) |
 
 ---
 
@@ -60,7 +60,7 @@ El middleware inyecta el `tenant_id` resuelto en headers o cookies para que el r
 
 ```
 src/app/
-├── (marketing)/                       # Landing público de NexusStore (host: nexusstore.com)
+├── (marketing)/                       # Landing público de OpenMag (host: openmag.co)
 │   ├── page.tsx                       # Landing con planes y CTA "Registra tu tienda"
 │   ├── precios/page.tsx
 │   ├── caracteristicas/page.tsx
@@ -68,7 +68,7 @@ src/app/
 │       ├── register/page.tsx          # Registro de NUEVA TIENDA (tenant)
 │       └── login/page.tsx             # Login de tenant-admin
 │
-├── (tenant)/                          # Dashboard por tienda (host: {slug}.nexusstore.com)
+├── (tenant)/                          # Dashboard por tienda (host: {slug}.openmag.co)
 │   ├── layout.tsx                     # Layout que aplica branding del tenant
 │   ├── page.tsx                       # Dashboard embajadora
 │   ├── revista/page.tsx
@@ -88,7 +88,7 @@ src/app/
 │       ├── ranking/page.tsx
 │       └── portadas/page.tsx
 │
-├── (super-admin)/                     # Panel global (host: admin.nexusstore.com)
+├── (super-admin)/                     # Panel global (host: admin.openmag.co)
 │   ├── layout.tsx
 │   ├── page.tsx                       # Lista de tiendas + métricas globales
 │   ├── tiendas/[id]/page.tsx          # Detalle/gestión de una tienda
@@ -138,7 +138,7 @@ src/app/
 -- ────────────────────────────────────────────────────────────
 CREATE TABLE public.tenants (
   id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  slug                  TEXT UNIQUE NOT NULL,           -- "mitienda" → mitienda.nexusstore.com
+  slug                  TEXT UNIQUE NOT NULL,           -- "mitienda" → mitienda.openmag.co
   custom_domain         TEXT UNIQUE,                    -- "embajadoras.mitienda.com" (opcional)
   store_name            TEXT NOT NULL,
   owner_user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -175,7 +175,7 @@ CREATE INDEX idx_tenants_custom_domain ON public.tenants(custom_domain) WHERE cu
 -- USUARIOS DE LA PLATAFORMA
 -- ────────────────────────────────────────────────────────────
 -- Cada usuario en auth.users puede ser:
---   - super-admin (NexusStore) → en public.platform_admins
+--   - super-admin (OpenMag) → en public.platform_admins
 --   - tenant-admin (dueño)     → en public.tenants.owner_user_id
 --   - embajadora               → en public.profiles con tenant_id
 
@@ -268,7 +268,7 @@ CREATE TABLE public.commission_summaries (
 );
 
 -- ────────────────────────────────────────────────────────────
--- TICKETS DE SOPORTE (cada tienda puede contactar a NexusStore)
+-- TICKETS DE SOPORTE (cada tienda puede contactar a OpenMag)
 -- ────────────────────────────────────────────────────────────
 CREATE TABLE public.support_tickets (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -338,9 +338,9 @@ NEXT_PUBLIC_SUPABASE_URL=https://TU_PROYECTO.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 
-# NexusStore branding (no de tiendas, de la plataforma)
-NEXT_PUBLIC_APP_URL=https://nexusstore.com
-NEXT_PUBLIC_ROOT_DOMAIN=nexusstore.com
+# OpenMag branding (no de tiendas, de la plataforma)
+NEXT_PUBLIC_APP_URL=https://openmag.co
+NEXT_PUBLIC_ROOT_DOMAIN=openmag.co
 
 # Chatbot
 GROQ_API_KEY=...
@@ -366,7 +366,7 @@ ENCRYPTION_KEY=...
 - [ ] Setup Next.js 16 + Tailwind 4 + Shadcn
 - [ ] Schema de DB con `tenants` + `tenant_id` en todas las tablas
 - [ ] Middleware de resolución de tenant por subdomain
-- [ ] Landing público de NexusStore (`nexusstore.com`)
+- [ ] Landing público de OpenMag (`openmag.co`)
 - [ ] Registro/login de tenant-admin
 
 ### Fase 2 — Tenant-admin (semanas 3-4)
@@ -382,7 +382,7 @@ ENCRYPTION_KEY=...
 - [ ] Webhook Shopify per-tenant
 
 ### Fase 4 — Super-admin (semana 8)
-- [ ] Panel `admin.nexusstore.com`
+- [ ] Panel `admin.openmag.co`
 - [ ] Lista de tiendas, suspender/activar
 - [ ] Métricas globales
 

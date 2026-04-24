@@ -89,7 +89,7 @@ export default function AdminTenantsPage() {
       <div>
         <h1 className="text-2xl font-bold">Tiendas</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Gestiona todas las tiendas registradas en NexusStore.
+          Gestiona todas las tiendas registradas en OpenMag.
         </p>
       </div>
 
@@ -143,7 +143,7 @@ export default function AdminTenantsPage() {
                         <div className="min-w-0">
                           <p className="font-medium truncate">{t.name}</p>
                           <p className="text-xs text-muted-foreground truncate font-mono">
-                            {t.slug}.nexusstore.com
+                            {t.slug}.openmag.co
                           </p>
                           <p className="text-xs text-muted-foreground truncate">{t.owner_email}</p>
                         </div>

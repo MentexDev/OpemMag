@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "nexusstore.com";
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "openmag.co";
 
 // Resolve a custom domain (e.g. "tienda.com") to a tenant slug via Supabase REST.
 // Returns null when no tenant matches or Supabase is not configured.

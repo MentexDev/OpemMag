@@ -30,7 +30,7 @@ const features = [
     icon: Globe,
     title: "Tu subdominio propio",
     description:
-      "Cada tienda obtiene su espacio en {tutienda}.nexusstore.com o dominio personalizado.",
+      "Cada tienda obtiene su espacio en {tutienda}.openmag.co o dominio personalizado.",
     color: "text-blue-500 dark:text-blue-400",
     bg: "bg-blue-500/10",
   },
@@ -140,7 +140,7 @@ export default function LandingPage() {
           <div className="flex items-center h-16">
             <div className="flex-1">
               <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-                NexusStore
+                OpenMag
               </span>
             </div>
 
@@ -233,7 +233,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-neutral-500 dark:text-neutral-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            NexusStore te da todo lo que necesitas para gestionar embajadoras,
+            OpenMag te da todo lo que necesitas para gestionar embajadoras,
             comisiones y ventas — con tu logo, tus colores y tu dominio.
           </p>
 
@@ -415,7 +415,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <span className="font-bold text-lg bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              NexusStore
+              OpenMag
             </span>
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((s) => (
@@ -424,7 +424,7 @@ export default function LandingPage() {
               <span className="text-xs text-neutral-400 ml-2">Potenciado por IA</span>
             </div>
             <p className="text-xs text-neutral-400 dark:text-neutral-600">
-              © {new Date().getFullYear()} NexusStore · Todos los derechos reservados
+              © {new Date().getFullYear()} OpenMag · Todos los derechos reservados
             </p>
           </div>
         </div>

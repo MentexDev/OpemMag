@@ -77,7 +77,7 @@ export default function DashboardShell({ tenant, user, children }: Props) {
         <div className="min-w-0">
           <p className="font-semibold text-sm truncate">{tenant.name}</p>
           <p className="text-xs text-muted-foreground truncate">
-            {tenant.slug}.nexusstore.com
+            {tenant.slug}.openmag.co
           </p>
         </div>
       </div>

@@ -84,7 +84,7 @@ export default function RegisterPage() {
     <Card>
       <CardHeader className="space-y-1">
         <div className="flex items-center gap-2 mb-2">
-          <span className="font-bold text-lg">NexusStore</span>
+          <span className="font-bold text-lg">OpenMag</span>
         </div>
         <CardTitle className="text-2xl">Crea tu tienda</CardTitle>
         <CardDescription>
@@ -109,7 +109,7 @@ export default function RegisterPage() {
             <Label htmlFor="slug">URL de tu tienda</Label>
             <div className="flex items-center rounded-md border bg-muted/50 overflow-hidden">
               <span className="px-3 py-2 text-sm text-muted-foreground border-r bg-muted select-none">
-                nexusstore.com/
+                openmag.co/
               </span>
               <Input
                 id="slug"

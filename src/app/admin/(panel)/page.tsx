@@ -63,7 +63,7 @@ export default async function AdminDashboardPage() {
       <div>
         <h1 className="text-2xl font-bold">Resumen global</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Métricas agregadas de todas las tiendas en NexusStore.
+          Métricas agregadas de todas las tiendas en OpenMag.
         </p>
       </div>
 

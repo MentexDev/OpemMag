@@ -143,7 +143,7 @@ export default async function TenantLandingPage({
       <footer className="border-t border-border py-6">
         <p className="text-center text-xs text-muted-foreground">
           Programa de embajadoras de {tenant.name} · Powered by{" "}
-          <span className="font-medium">NexusStore</span>
+          <span className="font-medium">OpenMag</span>
         </p>
       </footer>
     </div>

@@ -45,7 +45,7 @@ export default function AdminShell({ user, children }: Props) {
           <Shield className="h-4 w-4 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="font-semibold text-sm">NexusStore</p>
+          <p className="font-semibold text-sm">OpenMag</p>
           <p className="text-xs text-muted-foreground">Super-admin</p>
         </div>
       </div>

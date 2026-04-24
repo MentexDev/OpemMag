@@ -53,7 +53,7 @@ function LoginForm() {
             <Shield className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">Super-admin NexusStore</h1>
+            <h1 className="text-xl font-bold">Super-admin OpenMag</h1>
             <p className="text-sm text-muted-foreground mt-1">Acceso restringido</p>
           </div>
         </div>
@@ -64,7 +64,7 @@ function LoginForm() {
             <Input
               id="email"
               type="email"
-              placeholder="admin@nexusstore.com"
+              placeholder="admin@openmag.co"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required

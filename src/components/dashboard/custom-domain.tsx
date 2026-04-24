@@ -97,7 +97,7 @@ export default function CustomDomainSection() {
           Dominio personalizado
         </h2>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Usa tu propio dominio (ej: <span className="font-mono">tienda.com</span>) en lugar del subdominio NexusStore.
+          Usa tu propio dominio (ej: <span className="font-mono">tienda.com</span>) en lugar del subdominio OpenMag.
         </p>
       </div>
 
@@ -105,7 +105,7 @@ export default function CustomDomainSection() {
         <div className="rounded-md border border-yellow-500/30 bg-yellow-500/5 px-3 py-2 text-xs text-yellow-700 dark:text-yellow-400 flex gap-2">
           <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
           <span>
-            Vercel no está configurado en el servidor. El dominio se guardará pero la verificación SSL no se ejecutará. Pídele al administrador de NexusStore que añada <span className="font-mono">VERCEL_TOKEN</span> y <span className="font-mono">VERCEL_PROJECT_ID</span>.
+            Vercel no está configurado en el servidor. El dominio se guardará pero la verificación SSL no se ejecutará. Pídele al administrador de OpenMag que añada <span className="font-mono">VERCEL_TOKEN</span> y <span className="font-mono">VERCEL_PROJECT_ID</span>.
           </span>
         </div>
       )}
