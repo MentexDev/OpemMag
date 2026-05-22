@@ -15,7 +15,7 @@ export default async function AmbassadorDashboardPage({
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect(`/t/${slug}/login`);
+  if (!user) redirect(`/login`);
 
   const admin = createAdminClient();
 
@@ -26,7 +26,7 @@ export default async function AmbassadorDashboardPage({
     .eq("slug", slug)
     .maybeSingle();
 
-  if (!tenant) redirect(`/t/${slug}/login`);
+  if (!tenant) redirect(`/login`);
 
   // Verify membership
   const { data: membership } = await admin
@@ -36,7 +36,7 @@ export default async function AmbassadorDashboardPage({
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!membership) redirect(`/t/${slug}/login`);
+  if (!membership) redirect(`/login`);
 
   // Get profile
   const { data: profile } = await admin
@@ -154,7 +154,7 @@ export default async function AmbassadorDashboardPage({
             <h2 className="font-semibold text-sm">Mis ventas</h2>
             <p className="text-sm text-muted-foreground">Historial de ventas registradas y comisiones.</p>
             <Link
-              href={`/t/${slug}/ventas`}
+              href="/ventas"
               className="inline-flex items-center gap-1.5 text-sm font-medium mt-1 hover:underline"
               style={{ color: "var(--brand-primary, #6366f1)" }}
             >
@@ -165,7 +165,7 @@ export default async function AmbassadorDashboardPage({
             <h2 className="font-semibold text-sm">Ranking</h2>
             <p className="text-sm text-muted-foreground">Compara tu desempeño con otras embajadoras.</p>
             <Link
-              href={`/t/${slug}/ranking`}
+              href="/ranking"
               className="inline-flex items-center gap-1.5 text-sm font-medium mt-1 hover:underline"
               style={{ color: "var(--brand-primary, #6366f1)" }}
             >

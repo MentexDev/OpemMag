@@ -54,7 +54,7 @@ export default async function PublicCardPage({
   const avatarRadius =
     avatarShape === "circle" ? "9999px" : avatarShape === "rounded" ? "20px" : "0px";
 
-  const revistaUrl = `/t/${slug}/ver?ref=${profile.referral_code}`;
+  const revistaUrl = `/ver?ref=${profile.referral_code}`;
 
   return (
     <div

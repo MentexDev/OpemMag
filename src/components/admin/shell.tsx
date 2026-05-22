@@ -23,8 +23,8 @@ interface Props {
 }
 
 const navItems = [
-  { href: "/admin", label: "Resumen", icon: LayoutDashboard },
-  { href: "/admin/tenants", label: "Tiendas", icon: Building2 },
+  { href: "/", label: "Resumen", icon: LayoutDashboard },
+  { href: "/tenants", label: "Tiendas", icon: Building2 },
 ];
 
 export default function AdminShell({ user, children }: Props) {
@@ -35,7 +35,7 @@ export default function AdminShell({ user, children }: Props) {
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/admin/login");
+    router.push("/login");
   }
 
   const Sidebar = () => (
@@ -55,8 +55,8 @@ export default function AdminShell({ user, children }: Props) {
       <nav className="flex-1 p-3 space-y-1">
         {navItems.map((item) => {
           const active =
-            item.href === "/admin"
-              ? pathname === "/admin"
+            item.href === "/"
+              ? pathname === "/"
               : pathname.startsWith(item.href);
           return (
             <Link

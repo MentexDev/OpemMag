@@ -10,10 +10,10 @@ export default async function AdminPanelLayout({
 }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+  if (!user) redirect("/login");
 
   const allowed = await isSuperAdmin(user.id);
-  if (!allowed) redirect("/admin/login?error=forbidden");
+  if (!allowed) redirect("/login?error=forbidden");
 
   return <AdminShell user={user}>{children}</AdminShell>;
 }

@@ -40,7 +40,7 @@ export default function AmbassadorLoginPage() {
       return;
     }
 
-    router.push(`/t/${slug}/dashboard`);
+    router.push(`/dashboard`);
   }
 
   return (
@@ -77,7 +77,7 @@ export default function AmbassadorLoginPage() {
 
         <p className="text-center text-sm text-muted-foreground">
           ¿No tienes cuenta?{" "}
-          <Link href={`/t/${slug}/register`} className="underline hover:text-foreground">
+          <Link href="/register" className="underline hover:text-foreground">
             Regístrate gratis
           </Link>
         </p>

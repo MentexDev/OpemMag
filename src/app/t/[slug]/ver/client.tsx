@@ -58,7 +58,7 @@ export default function RevistaClient({ tenant, ids, refCode }: Props) {
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href={`/t/${tenant.slug}`} className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             {tenant.logo_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={tenant.logo_url} alt={tenant.name} className="h-7 w-auto object-contain" />
@@ -157,7 +157,7 @@ export default function RevistaClient({ tenant, ids, refCode }: Props) {
         {/* Floating WhatsApp / share — solo si hay ref */}
         {refCode && products.length > 0 && (
           <Link
-            href={`/t/${tenant.slug}/card/${refCode}`}
+            href={`/card/${refCode}`}
             className="fixed bottom-6 right-6 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white shadow-2xl transition-transform hover:scale-105"
             style={{ backgroundColor: tenant.primary_color }}
           >

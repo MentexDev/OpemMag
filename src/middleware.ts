@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "openmag.co";
 
-// Resolve a custom domain (e.g. "tienda.com") to a tenant slug via Supabase REST.
-// Returns null when no tenant matches or Supabase is not configured.
+// Resolve a custom domain to a tenant slug via Supabase REST.
+// Uses direct fetch (Edge-compatible) instead of the Node.js Supabase client.
 async function resolveCustomDomain(host: string): Promise<string | null> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -28,7 +27,7 @@ async function resolveCustomDomain(host: string): Promise<string | null> {
   }
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get("host") ?? "";
   const host = hostname.replace(/:.*/, "");
@@ -38,50 +37,37 @@ export async function proxy(request: NextRequest) {
   let customDomainSlug: string | null = null;
 
   if (host === ROOT_DOMAIN || host === `www.${ROOT_DOMAIN}`) {
-    // Root domain
+    // Root domain — no rewrite needed
   } else if (host.endsWith(`.${ROOT_DOMAIN}`)) {
     subdomain = host.slice(0, -(ROOT_DOMAIN.length + 1));
   } else if (host === "localhost" || host === "127.0.0.1") {
-    const tenantParam = url.searchParams.get("tenant");
-    subdomain = tenantParam ?? null;
+    // Local dev: simulate subdomain with ?tenant=slug query param
+    subdomain = url.searchParams.get("tenant") ?? null;
   } else {
     // Possible custom domain — look up against DB
     customDomainSlug = await resolveCustomDomain(host);
   }
 
-  // 2. Refresh session cookies (skip if Supabase not configured)
+  // 2. Build base response (session refresh happens in layouts via Supabase SSR)
   const response = NextResponse.next();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (supabaseUrl && supabaseAnonKey && !supabaseUrl.includes("TU_PROYECTO")) {
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    });
-    await supabase.auth.getSession();
-  }
 
-  // 3. Forward identity via headers
+  // 3. Forward tenant identity via response headers
   const effectiveSlug = customDomainSlug ?? subdomain;
   if (effectiveSlug) response.headers.set("x-tenant-slug", effectiveSlug);
   if (customDomainSlug) response.headers.set("x-tenant-host", host);
 
-  // 4. Rewrites
+  // 4. URL rewrites by subdomain — skip /api/ so client-side fetches aren't double-prefixed
   if (effectiveSlug === "admin") {
-    url.pathname = `/admin${url.pathname}`;
+    if (!url.pathname.startsWith("/api/")) {
+      url.pathname = `/admin${url.pathname}`;
+    }
     return NextResponse.rewrite(url, { headers: response.headers });
   }
 
   if (effectiveSlug && effectiveSlug !== "www") {
-    url.pathname = `/t/${effectiveSlug}${url.pathname}`;
+    if (!url.pathname.startsWith("/api/")) {
+      url.pathname = `/t/${effectiveSlug}${url.pathname}`;
+    }
     return NextResponse.rewrite(url, { headers: response.headers });
   }
 

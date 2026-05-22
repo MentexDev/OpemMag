@@ -1,0 +1,27 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "openmag",
+  "compatibility_date": "2026-05-22",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    { "pattern": "openmag.co/*", "zone_name": "openmag.co" },
+    { "pattern": "*.openmag.co/*", "zone_name": "openmag.co" }
+  ],
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "openmag"
+    }
+  ],
+  "vars": {
+    "NEXT_PUBLIC_APP_URL": "https://openmag.co",
+    "NEXT_PUBLIC_ROOT_DOMAIN": "openmag.co",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://matpnkewinvlfbbaewhy.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_UFUpgTyF8IoHrTPDGvr0Zg_LvXYatgm"
+  }
+}

@@ -58,7 +58,7 @@ export default async function TenantLandingPage({
             <span className="font-semibold text-foreground">{tenant.name}</span>
           </div>
           <Link
-            href={`/t/${slug}/login`}
+            href={`/login`}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             Iniciar sesión
@@ -108,7 +108,7 @@ export default async function TenantLandingPage({
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <Link
-              href={`/t/${slug}/register`}
+              href="/register"
               className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-base font-semibold text-white transition-all hover:opacity-90 shadow-lg"
               style={{ backgroundColor: "var(--brand-primary, #6366f1)" }}
             >
@@ -116,7 +116,7 @@ export default async function TenantLandingPage({
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href={`/t/${slug}/login`}
+              href={`/login`}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-8 py-3.5 text-base font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
             >
               Ya tengo cuenta

@@ -42,7 +42,7 @@ function LoginForm() {
       return;
     }
 
-    router.push("/admin");
+    router.push("/");
   }
 
   return (

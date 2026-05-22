@@ -1,0 +1,10 @@
+# Copia este archivo a .dev.vars para preview local con wrangler
+# (igual que .env.local pero lo lee wrangler dev)
+
+NEXT_PUBLIC_SUPABASE_URL=https://TU_PROYECTO.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+ENCRYPTION_KEY=
+
+GROQ_API_KEY=
+RESEND_API_KEY=
