@@ -48,14 +48,16 @@ export default async function TenantLandingPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={tenant.logo_url} alt={tenant.name} className="h-8 w-auto object-contain" />
             ) : (
-              <div
-                className="h-8 w-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-                style={{ backgroundColor: "var(--brand-primary, #6366f1)" }}
-              >
-                {tenant.name[0].toUpperCase()}
-              </div>
+              <>
+                <div
+                  className="h-8 w-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+                  style={{ backgroundColor: "var(--brand-primary, #6366f1)" }}
+                >
+                  {tenant.name[0].toUpperCase()}
+                </div>
+                <span className="font-semibold text-foreground">{tenant.name}</span>
+              </>
             )}
-            <span className="font-semibold text-foreground">{tenant.name}</span>
           </div>
           <Link
             href={`/login`}
