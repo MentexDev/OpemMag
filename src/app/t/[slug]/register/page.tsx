@@ -6,7 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, Clock } from "lucide-react";
 
 export default function AmbassadorRegisterPage() {
   const router = useRouter();
@@ -15,6 +15,7 @@ export default function AmbassadorRegisterPage() {
   const [form, setForm] = useState({ fullName: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,20 +35,48 @@ export default function AmbassadorRegisterPage() {
       return;
     }
 
-    // Sign in after registration
+    // Sign in after registration (so session is active)
     const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    await supabase.auth.signInWithPassword({
       email: form.email,
       password: form.password,
     });
 
-    if (signInError) {
-      setError("Registro exitoso, pero no se pudo iniciar sesión automáticamente. Intenta iniciar sesión.");
+    if (data.pending) {
+      setPending(true);
       setLoading(false);
       return;
     }
 
     router.push(`/dashboard`);
+  }
+
+  if (pending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+        <div className="w-full max-w-sm space-y-5 text-center">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/15 mx-auto">
+            <Clock className="h-7 w-7 text-yellow-600 dark:text-yellow-400" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold">Solicitud enviada</h1>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Tu cuenta está pendiente de aprobación por parte del administrador de la tienda.
+              Te avisarán cuando tu acceso esté activo.
+            </p>
+          </div>
+          <div className="rounded-lg border bg-muted/30 px-4 py-3 text-xs text-muted-foreground">
+            Registrada como: <span className="font-medium text-foreground">{form.email}</span>
+          </div>
+          <Link
+            href="/login"
+            className="inline-block text-sm underline text-muted-foreground hover:text-foreground"
+          >
+            Volver al inicio de sesión
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { DollarSign, ShoppingBag, Share2, LogOut } from "lucide-react";
+import { DollarSign, ShoppingBag, Share2, LogOut, Clock, XCircle } from "lucide-react";
+import CopyButton from "./copy-button";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -31,12 +32,60 @@ export default async function AmbassadorDashboardPage({
   // Verify membership
   const { data: membership } = await admin
     .from("tenant_users")
-    .select("role")
+    .select("role, status")
     .eq("tenant_id", tenant.id)
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!membership) redirect(`/login`);
+
+  if (membership.status === "pending") {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+        <div className="w-full max-w-sm text-center space-y-5">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/15 mx-auto">
+            <Clock className="h-7 w-7 text-yellow-600 dark:text-yellow-400" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-xl font-bold">Cuenta pendiente de aprobación</h1>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Tu solicitud para unirte al programa de {tenant.name} está siendo revisada.
+              Recibirás acceso en cuanto el administrador la apruebe.
+            </p>
+          </div>
+          <form action={`/api/ambassador/logout?slug=${slug}`} method="POST">
+            <button className="text-sm text-muted-foreground underline hover:text-foreground">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  if (membership.status === "rejected") {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+        <div className="w-full max-w-sm text-center space-y-5">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-destructive/15 mx-auto">
+            <XCircle className="h-7 w-7 text-destructive" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-xl font-bold">Solicitud rechazada</h1>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Tu solicitud para unirte al programa de {tenant.name} no fue aprobada.
+              Si crees que es un error, contacta directamente con la tienda.
+            </p>
+          </div>
+          <form action={`/api/ambassador/logout?slug=${slug}`} method="POST">
+            <button className="text-sm text-muted-foreground underline hover:text-foreground">
+              Cerrar sesión
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   // Get profile
   const { data: profile } = await admin
@@ -135,12 +184,7 @@ export default async function AmbassadorDashboardPage({
               <div className="flex-1 rounded-md border bg-muted/50 px-3 py-2 text-sm font-mono truncate">
                 {cardUrl}
               </div>
-              <button
-                onClick={() => navigator.clipboard.writeText(cardUrl)}
-                className="flex-shrink-0 rounded-md border px-3 py-2 text-sm hover:bg-muted transition-colors"
-              >
-                Copiar
-              </button>
+              <CopyButton text={cardUrl} />
             </div>
             <p className="text-xs text-muted-foreground">
               Código: <span className="font-mono font-medium">{profile.referral_code}</span>

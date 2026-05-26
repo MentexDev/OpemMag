@@ -25,26 +25,28 @@ export async function GET() {
 
   const admin = createAdminClient();
 
-  // Query 1: ambassador memberships
-  const { data: members } = await admin
+  // Query 1: memberships
+  const { data: members, error } = await admin
     .from("tenant_users")
-    .select("user_id, created_at, status")
+    .select("user_id, status, created_at")
     .eq("tenant_id", tenantId)
     .eq("role", "ambassador")
     .order("created_at", { ascending: false });
 
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
   if (!members || members.length === 0) {
-    return NextResponse.json({ ambassadors: [] });
+    return NextResponse.json({ ambassadors: [], pending: 0 });
   }
 
-  type MemberRow = { user_id: string; created_at: string; status: string };
+  type MemberRow = { user_id: string; status: string; created_at: string };
   const membersArr = members as MemberRow[];
   const userIds = membersArr.map((m) => m.user_id);
 
-  // Query 2: profiles for those users
+  // Query 2: profiles
   const { data: profiles } = await admin
     .from("profiles")
-    .select("id, full_name, referral_code, is_active, avatar_url, phone, city")
+    .select("id, full_name, referral_code, avatar_url, city, phone")
     .eq("tenant_id", tenantId)
     .in("id", userIds);
 
@@ -52,16 +54,15 @@ export async function GET() {
     id: string;
     full_name?: string;
     referral_code?: string;
-    is_active?: boolean;
     avatar_url?: string | null;
-    phone?: string;
     city?: string;
+    phone?: string;
   };
   const profileMap = Object.fromEntries(
     ((profiles ?? []) as ProfileRow[]).map((p) => [p.id, p])
   );
 
-  // Query 3: emails via admin auth
+  // Query 3: emails
   const emailMap: Record<string, string> = {};
   for (const uid of userIds) {
     const { data: u } = await admin.auth.admin.getUserById(uid);
@@ -72,18 +73,19 @@ export async function GET() {
     const p = profileMap[m.user_id];
     return {
       user_id: m.user_id,
-      status: m.status ?? "approved",
+      status: m.status,
+      created_at: m.created_at,
       email: emailMap[m.user_id] ?? "",
       full_name: p?.full_name ?? "",
       referral_code: p?.referral_code ?? "",
-      is_active: p?.is_active ?? true,
-      phone: p?.phone ?? "",
       city: p?.city ?? "",
-      joined_at: m.created_at,
+      phone: p?.phone ?? "",
     };
   });
 
-  return NextResponse.json({ ambassadors });
+  const pending = ambassadors.filter((a) => a.status === "pending").length;
+
+  return NextResponse.json({ ambassadors, pending });
 }
 
 export async function PATCH(request: NextRequest) {
@@ -94,15 +96,29 @@ export async function PATCH(request: NextRequest) {
   const tenantId = await getTenantId(user.id);
   if (!tenantId) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
 
-  const { user_id, is_active } = await request.json();
-  const admin = createAdminClient();
+  const { user_id, action } = await request.json();
+  if (!user_id || !["approve", "reject"].includes(action)) {
+    return NextResponse.json({ error: "Datos inválidos." }, { status: 400 });
+  }
 
-  const { error } = await admin
+  const admin = createAdminClient();
+  const newStatus = action === "approve" ? "approved" : "rejected";
+
+  const { error: tuError } = await admin
+    .from("tenant_users")
+    .update({ status: newStatus })
+    .eq("tenant_id", tenantId)
+    .eq("user_id", user_id);
+
+  if (tuError) return NextResponse.json({ error: tuError.message }, { status: 500 });
+
+  const { error: pError } = await admin
     .from("profiles")
-    .update({ is_active })
+    .update({ is_active: action === "approve" })
     .eq("id", user_id)
     .eq("tenant_id", tenantId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (pError) return NextResponse.json({ error: pError.message }, { status: 500 });
+
   return NextResponse.json({ ok: true });
 }

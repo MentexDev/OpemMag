@@ -29,8 +29,16 @@ export default async function DashboardLayout({
     ? tenantUser.tenants[0]
     : tenantUser.tenants;
 
+  // Pending approvals count for badge
+  const { count: pendingCount } = await admin
+    .from("tenant_users")
+    .select("*", { count: "exact", head: true })
+    .eq("tenant_id", tenant.id)
+    .eq("role", "ambassador")
+    .eq("status", "pending");
+
   return (
-    <DashboardShell tenant={tenant} user={user}>
+    <DashboardShell tenant={tenant} user={user} pendingCount={pendingCount ?? 0}>
       {children}
     </DashboardShell>
   );

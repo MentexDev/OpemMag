@@ -26,6 +26,7 @@ interface TenantData {
   accent_color: string;
   logo_url: string | null;
   shopify_domain: string | null;
+  require_approval: boolean;
 }
 
 export default function ConfiguracionPage() {
@@ -37,6 +38,7 @@ export default function ConfiguracionPage() {
   const [name, setName] = useState("");
   const [primaryColor, setPrimaryColor] = useState("#6366f1");
   const [accentColor, setAccentColor] = useState("#a5b4fc");
+  const [requireApproval, setRequireApproval] = useState(false);
 
   // UI state
   const [saving, setSaving] = useState(false);
@@ -54,6 +56,7 @@ export default function ConfiguracionPage() {
     setPrimaryColor(t.primary_color ?? "#6366f1");
     setAccentColor(t.accent_color ?? "#a5b4fc");
     setLogoUrl(t.logo_url ?? null);
+    setRequireApproval(t.require_approval ?? false);
   }, []);
 
   useEffect(() => {
@@ -71,6 +74,7 @@ export default function ConfiguracionPage() {
         name,
         primary_color: primaryColor,
         accent_color: accentColor,
+        require_approval: requireApproval,
       }),
     });
     setSaving(false);
@@ -244,6 +248,35 @@ export default function ConfiguracionPage() {
           <div className="h-8 w-8 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }} />
           <div className="h-8 w-8 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
           <p className="text-xs text-muted-foreground">Previsualización de colores del portal</p>
+        </div>
+
+        {/* Toggle aprobación */}
+        <div className="flex items-start justify-between gap-4 rounded-xl border p-4">
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium">Aprobación manual de embajadoras</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Cuando está activo, las nuevas embajadoras quedan pendientes hasta que las apruebes
+              desde el panel de <span className="font-medium">Aprobaciones</span>.
+              Si está desactivado, se incorporan automáticamente.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={requireApproval}
+            onClick={() => setRequireApproval((v) => !v)}
+            className={cn(
+              "relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none",
+              requireApproval ? "bg-primary" : "bg-muted"
+            )}
+          >
+            <span
+              className={cn(
+                "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200",
+                requireApproval ? "translate-x-5" : "translate-x-0"
+              )}
+            />
+          </button>
         </div>
       </section>
 

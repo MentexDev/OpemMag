@@ -16,6 +16,7 @@ import {
   LogOut,
   Menu,
   X,
+  ClipboardCheck,
 } from "lucide-react";
 import { useState } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -32,19 +33,21 @@ interface Tenant {
 interface Props {
   tenant: Tenant;
   user: User;
+  pendingCount?: number;
   children: React.ReactNode;
 }
 
 const navItems = [
   { href: "/dashboard", label: "Panel", icon: LayoutDashboard },
   { href: "/dashboard/embajadoras", label: "Embajadoras", icon: Users },
+  { href: "/dashboard/aprobaciones", label: "Aprobaciones", icon: ClipboardCheck },
   { href: "/dashboard/ventas", label: "Ventas", icon: ShoppingBag },
   { href: "/dashboard/comisiones", label: "Comisiones", icon: DollarSign },
   { href: "/dashboard/ranking", label: "Ranking", icon: Trophy },
   { href: "/dashboard/configuracion", label: "Configuración", icon: Settings },
 ];
 
-export default function DashboardShell({ tenant, user, children }: Props) {
+export default function DashboardShell({ tenant, user, pendingCount = 0, children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -103,7 +106,12 @@ export default function DashboardShell({ tenant, user, children }: Props) {
               )}
             >
               <item.icon className="h-4 w-4 flex-shrink-0" />
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.href === "/dashboard/aprobaciones" && pendingCount > 0 && (
+                <span className="inline-flex items-center justify-center rounded-full bg-yellow-500 text-white text-[10px] font-bold h-4 min-w-4 px-1">
+                  {pendingCount}
+                </span>
+              )}
             </Link>
           );
         })}

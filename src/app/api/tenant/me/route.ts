@@ -12,7 +12,7 @@ export async function GET() {
   const admin = createAdminClient();
   const { data } = await admin
     .from("tenant_users")
-    .select("tenant_id, tenants(id, name, slug, primary_color, accent_color, logo_url, shopify_domain)")
+    .select("tenant_id, tenants(id, name, slug, primary_color, accent_color, logo_url, shopify_domain, require_approval)")
     .eq("user_id", user.id)
     .eq("role", "admin")
     .maybeSingle();
@@ -42,10 +42,13 @@ export async function PATCH(request: Request) {
 
   if (!tu) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
 
+  const { require_approval } = body;
+
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (name !== undefined) updates.name = name;
   if (primary_color !== undefined) updates.primary_color = primary_color;
   if (accent_color !== undefined) updates.accent_color = accent_color;
+  if (require_approval !== undefined) updates.require_approval = require_approval;
 
   const { error } = await admin
     .from("tenants")

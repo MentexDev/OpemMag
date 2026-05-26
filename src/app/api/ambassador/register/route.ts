@@ -19,10 +19,9 @@ export async function POST(request: NextRequest) {
 
   const admin = createAdminClient();
 
-  // Get tenant by slug
   const { data: tenant } = await admin
     .from("tenants")
-    .select("id, is_active")
+    .select("id, is_active, require_approval")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -30,7 +29,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Programa de embajadoras no encontrado." }, { status: 404 });
   }
 
-  // Create auth user
   const { data: authData, error: authError } = await admin.auth.admin.createUser({
     email,
     password,
@@ -44,12 +42,14 @@ export async function POST(request: NextRequest) {
 
   const userId = authData.user.id;
   const referralCode = generateReferralCode(fullName);
+  const requiresApproval = tenant.require_approval === true;
+  const memberStatus = requiresApproval ? "pending" : "approved";
 
-  // Create tenant_users record
   const { error: tuError } = await admin.from("tenant_users").insert({
     tenant_id: tenant.id,
     user_id: userId,
     role: "ambassador",
+    status: memberStatus,
   });
 
   if (tuError) {
@@ -57,14 +57,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Error al registrar embajadora." }, { status: 500 });
   }
 
-  // Create profile
   await admin.from("profiles").insert({
     id: userId,
     tenant_id: tenant.id,
     full_name: fullName,
     referral_code: referralCode,
-    is_active: true,
+    is_active: !requiresApproval,
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, pending: requiresApproval });
 }
