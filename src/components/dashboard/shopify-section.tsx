@@ -130,6 +130,8 @@ function ShopifySectionInner() {
   const [state, setState] = useState<ShopifyState | null>(null);
   const [loading, setLoading] = useState(true);
   const [shopInput, setShopInput] = useState("");
+  const [tokenInput, setTokenInput] = useState("");
+  const [mode, setMode] = useState<"oauth" | "token">("token");
   const [submitting, setSubmitting] = useState(false);
   const [flash, setFlash] = useState(initialFlash);
   const [showGuide, setShowGuide] = useState(false);
@@ -143,13 +145,35 @@ function ShopifySectionInner() {
 
   useEffect(() => { load(); }, [load]);
 
-  function handleConnect(e: React.FormEvent) {
+  function handleOAuthConnect(e: React.FormEvent) {
     e.preventDefault();
     const shop = shopInput.trim();
     if (!shop) return;
     setSubmitting(true);
-    // Full page redirect — Shopify OAuth requires top-level navigation
     window.location.href = `/api/shopify/install?shop=${encodeURIComponent(shop)}`;
+  }
+
+  async function handleTokenConnect(e: React.FormEvent) {
+    e.preventDefault();
+    const shop = shopInput.trim();
+    const token = tokenInput.trim();
+    if (!shop || !token) return;
+    setSubmitting(true);
+    const res = await fetch("/api/shopify/connect-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ shop: shop.includes(".") ? shop : `${shop}.myshopify.com`, token }),
+    });
+    setSubmitting(false);
+    if (res.ok) {
+      await load();
+      setFlash({ type: "success", msg: "Tienda Shopify conectada correctamente." });
+      setShopInput("");
+      setTokenInput("");
+    } else {
+      const { error } = await res.json();
+      setFlash({ type: "error", msg: error ?? "Error al conectar la tienda." });
+    }
   }
 
   async function handleDisconnect() {
@@ -227,48 +251,98 @@ function ShopifySectionInner() {
               <p className="text-xs text-muted-foreground font-mono truncate">{state.shop}</p>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleDisconnect}
-              disabled={submitting || !state.oauthConfigured}
-              className="text-destructive hover:text-destructive"
-            >
-              <Unlink className="h-3.5 w-3.5 mr-1.5" />
-              Desconectar
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDisconnect}
+            disabled={submitting}
+            className="text-destructive hover:text-destructive"
+          >
+            <Unlink className="h-3.5 w-3.5 mr-1.5" />
+            Desconectar
+          </Button>
         </div>
       ) : (
-        <form onSubmit={handleConnect} className="space-y-3">
-          <div className="space-y-2">
-            <Label htmlFor="shop">Nombre de tu tienda Shopify</Label>
-            <div className="flex items-center rounded-md border bg-muted/50 overflow-hidden">
-              <Input
-                id="shop"
-                placeholder="mi-tienda"
-                value={shopInput}
-                onChange={(e) => setShopInput(e.target.value)}
-                required
-                className="border-0 rounded-none focus-visible:ring-0 bg-transparent"
-              />
-              <span className="px-3 py-2 text-xs text-muted-foreground border-l bg-muted select-none">
-                .myshopify.com
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Si tu URL de admin es <span className="font-mono">mi-tienda.myshopify.com</span>, solo escribe <span className="font-mono">mi-tienda</span>.
-            </p>
+        <div className="space-y-4">
+          {/* Toggle de modo */}
+          <div className="flex rounded-lg border overflow-hidden text-xs">
+            <button
+              type="button"
+              onClick={() => setMode("token")}
+              className={`flex-1 py-2 px-3 transition-colors font-medium ${mode === "token" ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}
+            >
+              App personalizada (token)
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("oauth")}
+              className={`flex-1 py-2 px-3 transition-colors font-medium ${mode === "oauth" ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}
+            >
+              Shopify Partners (OAuth)
+            </button>
           </div>
-          <Button type="submit" disabled={submitting || !state.oauthConfigured || !shopInput}>
-            {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link2 className="h-4 w-4 mr-2" />}
-            Conectar mi tienda Shopify
-          </Button>
-          <p className="text-xs text-muted-foreground">
-            Te llevaremos a Shopify para autorizar. Pediremos permisos de solo lectura: productos, órdenes, clientes e inventario.
-          </p>
-        </form>
+
+          {mode === "token" ? (
+            <form onSubmit={handleTokenConnect} className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="shop-token">Nombre de tu tienda</Label>
+                <div className="flex items-center rounded-md border bg-muted/50 overflow-hidden">
+                  <Input
+                    id="shop-token"
+                    placeholder="mi-tienda"
+                    value={shopInput}
+                    onChange={(e) => setShopInput(e.target.value)}
+                    required
+                    className="border-0 rounded-none focus-visible:ring-0 bg-transparent"
+                  />
+                  <span className="px-3 py-2 text-xs text-muted-foreground border-l bg-muted select-none">.myshopify.com</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="token">Token de acceso de la app</Label>
+                <Input
+                  id="token"
+                  type="password"
+                  placeholder="shpat_xxxxxxxxxxxxxxxx"
+                  value={tokenInput}
+                  onChange={(e) => setTokenInput(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  En tu admin de Shopify: <span className="font-medium">Configuración → Apps → Apps personalizadas</span> → tu app → <span className="font-medium">Token de acceso de la API de Admin</span>.
+                </p>
+              </div>
+              <Button type="submit" disabled={submitting || !shopInput || !tokenInput}>
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link2 className="h-4 w-4 mr-2" />}
+                Conectar tienda
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleOAuthConnect} className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="shop-oauth">Nombre de tu tienda</Label>
+                <div className="flex items-center rounded-md border bg-muted/50 overflow-hidden">
+                  <Input
+                    id="shop-oauth"
+                    placeholder="mi-tienda"
+                    value={shopInput}
+                    onChange={(e) => setShopInput(e.target.value)}
+                    required
+                    className="border-0 rounded-none focus-visible:ring-0 bg-transparent"
+                  />
+                  <span className="px-3 py-2 text-xs text-muted-foreground border-l bg-muted select-none">.myshopify.com</span>
+                </div>
+              </div>
+              <Button type="submit" disabled={submitting || !state.oauthConfigured || !shopInput}>
+                {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link2 className="h-4 w-4 mr-2" />}
+                Conectar con Shopify Partners
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Requiere una app creada en <span className="font-medium">partners.shopify.com</span>. Haz clic en el <HelpCircle className="h-3 w-3 inline" /> para ver la guía.
+              </p>
+            </form>
+          )}
+        </div>
       )}
     </div>
   );
