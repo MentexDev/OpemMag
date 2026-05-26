@@ -7,91 +7,139 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Check, AlertCircle, ShoppingBag, Link2, Unlink, HelpCircle, X, ExternalLink } from "lucide-react";
 
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <div className="flex gap-4">
+      <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">{n}</div>
+      <div className="space-y-1.5 min-w-0">
+        <p className="text-sm font-medium">{title}</p>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function GuideCustomApp() {
+  return (
+    <div className="space-y-5">
+      <Step n={1} title="Abre el admin de tu tienda Shopify">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Ve a <span className="font-mono bg-muted px-1 py-0.5 rounded text-[11px]">tu-tienda.myshopify.com/admin</span> e inicia sesión como dueño de la tienda.
+        </p>
+      </Step>
+      <Step n={2} title="Ve a Configuración → Apps y canales de ventas">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          En el menú inferior izquierdo haz clic en <span className="font-medium">Configuración</span>, luego en <span className="font-medium">Apps y canales de ventas</span>.
+        </p>
+      </Step>
+      <Step n={3} title="Desarrollar apps → Crear una app">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Haz clic en <span className="font-medium">Desarrollar apps</span> (esquina superior derecha) y luego en <span className="font-medium">Crear una app</span>. Dale cualquier nombre, por ejemplo <span className="italic">"OpenMag"</span>.
+        </p>
+      </Step>
+      <Step n={4} title="Configura los permisos de la API de Admin">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Dentro de la app ve a la pestaña <span className="font-medium">Configuración de la API</span>. En <span className="font-medium">Permisos de la API de Admin</span> activa al menos: <span className="font-medium">Pedidos (lectura)</span> y <span className="font-medium">Productos (lectura)</span>. Guarda.
+        </p>
+      </Step>
+      <Step n={5} title="Instala la app y copia el token">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Ve a la pestaña <span className="font-medium">Instalar app</span> y haz clic en el botón de instalar. Shopify te mostrará el <span className="font-medium">Token de acceso de la API de Admin</span> (<span className="font-mono text-[11px]">shpat_...</span>). <span className="text-foreground font-medium">Cópialo, solo se muestra una vez.</span>
+        </p>
+      </Step>
+      <Step n={6} title="Conecta en OpenMag">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Cierra esta guía, selecciona la pestaña <span className="font-medium">App personalizada (token)</span>, escribe el nombre de tu tienda y pega el token. Haz clic en <span className="font-medium">Conectar tienda</span>.
+        </p>
+      </Step>
+      <div className="rounded-lg border border-green-500/20 bg-green-500/5 px-3 py-2.5 text-xs text-green-700 dark:text-green-400 leading-relaxed">
+        <strong>Recomendado para tu propia tienda.</strong> Es la opción más rápida si solo vas a conectar una tienda.
+      </div>
+    </div>
+  );
+}
+
+function GuidePartnersApp() {
+  return (
+    <div className="space-y-5">
+      <Step n={1} title="Crea una cuenta en Shopify Partners">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Ve a <span className="font-mono bg-muted px-1 py-0.5 rounded text-[11px]">partners.shopify.com</span> y regístrate gratis.
+        </p>
+        <a href="https://partners.shopify.com/signup" target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+          Ir a Shopify Partners <ExternalLink className="h-3 w-3" />
+        </a>
+      </Step>
+      <Step n={2} title="Crea una nueva app">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          En el panel de Partners ve a <span className="font-medium">Apps → Crear app → Crear app manualmente</span>. Ponle cualquier nombre, por ejemplo <span className="italic">"OpenMag"</span>.
+        </p>
+      </Step>
+      <Step n={3} title="Configura la URL de redirección">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          En la configuración de la app, busca <span className="font-medium">URLs de redirección permitidas</span> y agrega exactamente:
+        </p>
+        <div className="bg-muted rounded-lg px-3 py-2">
+          <code className="text-xs break-all">https://openmag.co/api/shopify/callback</code>
+        </div>
+      </Step>
+      <Step n={4} title="Copia el Client ID y Client Secret">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          En <span className="font-medium">Credenciales de la app</span> encontrarás el <span className="font-medium">Client ID</span> y el <span className="font-medium">Client Secret</span>. El administrador de OpenMag debe configurarlos como secretos del servidor (<span className="font-mono text-[11px]">SHOPIFY_API_KEY</span> y <span className="font-mono text-[11px]">SHOPIFY_API_SECRET</span>).
+        </p>
+      </Step>
+      <Step n={5} title="Conecta en OpenMag">
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Una vez configurados los secretos, selecciona la pestaña <span className="font-medium">Shopify Partners (OAuth)</span>, escribe el nombre de tu tienda y haz clic en <span className="font-medium">Conectar</span>. Te redirigirá a Shopify para autorizar.
+        </p>
+      </Step>
+      <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2.5 text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
+        <strong>Recomendado si gestionas múltiples tiendas.</strong> Permite que cualquier comerciante de Shopify conecte su tienda con un clic.
+      </div>
+    </div>
+  );
+}
+
 function ShopifyGuideModal({ onClose }: { onClose: () => void }) {
+  const [tab, setTab] = useState<"custom" | "partners">("custom");
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-background border rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-5 border-b">
-          <div>
-            <h2 className="font-semibold text-base">Cómo crear tu app en Shopify</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Guía paso a paso — 5 minutos</p>
+      <div className="relative bg-background border rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-start justify-between p-5 border-b flex-shrink-0">
+          <div className="space-y-3 flex-1 min-w-0 pr-4">
+            <div>
+              <h2 className="font-semibold text-base">Cómo conectar tu tienda Shopify</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Elige el método que mejor se adapte a ti</p>
+            </div>
+            <div className="flex rounded-lg border overflow-hidden text-xs">
+              <button
+                type="button"
+                onClick={() => setTab("custom")}
+                className={`flex-1 py-2 px-3 transition-colors font-medium ${tab === "custom" ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}
+              >
+                App personalizada
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab("partners")}
+                className={`flex-1 py-2 px-3 transition-colors font-medium ${tab === "partners" ? "bg-primary text-primary-foreground" : "bg-muted/50 text-muted-foreground hover:text-foreground"}`}
+              >
+                Shopify Partners
+              </button>
+            </div>
           </div>
-          <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-muted transition-colors">
+          <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-muted transition-colors flex-shrink-0">
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="p-5 space-y-5">
-          {/* Paso 1 */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">1</div>
-            <div className="space-y-1.5 min-w-0">
-              <p className="text-sm font-medium">Crea una cuenta en Shopify Partners</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Ve a <span className="font-mono bg-muted px-1 py-0.5 rounded text-[11px]">partners.shopify.com</span> y regístrate gratis. Si ya tienes cuenta, inicia sesión.
-              </p>
-              <a
-                href="https://partners.shopify.com/signup"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-              >
-                Ir a Shopify Partners <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-          </div>
-
-          {/* Paso 2 */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">2</div>
-            <div className="space-y-1.5 min-w-0">
-              <p className="text-sm font-medium">Crea una nueva app</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                En el panel de Partners ve a <span className="font-medium">Apps → Crear app → Crear app manualmente</span>. Ponle cualquier nombre, por ejemplo <span className="italic">"OpenMag"</span>.
-              </p>
-            </div>
-          </div>
-
-          {/* Paso 3 */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">3</div>
-            <div className="space-y-1.5 min-w-0">
-              <p className="text-sm font-medium">Configura la URL de redirección</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                En la configuración de la app, busca <span className="font-medium">URLs de redirección permitidas</span> y agrega exactamente esta URL:
-              </p>
-              <div className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 mt-1">
-                <code className="text-xs flex-1 break-all">https://openmag.co/api/shopify/callback</code>
-              </div>
-            </div>
-          </div>
-
-          {/* Paso 4 */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">4</div>
-            <div className="space-y-1.5 min-w-0">
-              <p className="text-sm font-medium">Copia el Client ID y Client Secret</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                En la sección <span className="font-medium">Credenciales de la app</span> encontrarás el <span className="font-medium">Client ID</span> (Clave API) y el <span className="font-medium">Client Secret</span>. Envíaselos al administrador de OpenMag para que los configure en el servidor.
-              </p>
-            </div>
-          </div>
-
-          {/* Paso 5 */}
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">5</div>
-            <div className="space-y-1.5 min-w-0">
-              <p className="text-sm font-medium">Conecta tu tienda</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Una vez configurado el servidor, vuelve aquí, escribe el nombre de tu tienda (ej. <span className="font-mono bg-muted px-1 py-0.5 rounded text-[11px]">mi-tienda</span>) y haz clic en <span className="font-medium">Conectar mi tienda Shopify</span>. Te redirigirá a Shopify para autorizar.
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2.5 text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
-            <strong>¿Por qué se necesita esto?</strong> Shopify requiere que registres tu app para poder leer órdenes y productos de tu tienda de forma segura y automática.
-          </div>
+        {/* Content */}
+        <div className="p-5 overflow-y-auto">
+          {tab === "custom" ? <GuideCustomApp /> : <GuidePartnersApp />}
         </div>
       </div>
     </div>
