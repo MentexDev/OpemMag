@@ -27,6 +27,7 @@ interface TenantData {
   logo_url: string | null;
   shopify_domain: string | null;
   require_approval: boolean;
+  commission_rate: number;
 }
 
 export default function ConfiguracionPage() {
@@ -39,6 +40,7 @@ export default function ConfiguracionPage() {
   const [primaryColor, setPrimaryColor] = useState("#6366f1");
   const [accentColor, setAccentColor] = useState("#a5b4fc");
   const [requireApproval, setRequireApproval] = useState(false);
+  const [commissionRate, setCommissionRate] = useState("15");
 
   // UI state
   const [saving, setSaving] = useState(false);
@@ -57,6 +59,7 @@ export default function ConfiguracionPage() {
     setAccentColor(t.accent_color ?? "#a5b4fc");
     setLogoUrl(t.logo_url ?? null);
     setRequireApproval(t.require_approval ?? false);
+    setCommissionRate(String(t.commission_rate ?? 15));
   }, []);
 
   useEffect(() => {
@@ -75,6 +78,7 @@ export default function ConfiguracionPage() {
         primary_color: primaryColor,
         accent_color: accentColor,
         require_approval: requireApproval,
+        commission_rate: parseFloat(commissionRate) || 15,
       }),
     });
     setSaving(false);
@@ -277,6 +281,35 @@ export default function ConfiguracionPage() {
               )}
             />
           </button>
+        </div>
+
+        {/* Porcentaje de comisión */}
+        <div className="space-y-2">
+          <Label htmlFor="commission">Porcentaje de comisión para embajadoras</Label>
+          <div className="flex items-center gap-3">
+            <div className="relative w-32">
+              <Input
+                id="commission"
+                type="number"
+                min="0"
+                max="100"
+                step="0.5"
+                value={commissionRate}
+                onChange={e => setCommissionRate(e.target.value)}
+                className="pr-8"
+              />
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">%</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Por cada venta de <span className="font-medium">$100</span>, la embajadora recibe{" "}
+              <span className="font-medium text-foreground">
+                ${(parseFloat(commissionRate) || 0).toFixed(0)}
+              </span>
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Este porcentaje se aplica automáticamente a cada venta registrada.
+          </p>
         </div>
       </section>
 

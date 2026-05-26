@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   const admin = createAdminClient();
   const { data: tenant } = await admin
     .from("tenants")
-    .select("id, is_active")
+    .select("id, is_active, commission_rate")
     .eq("shopify_domain", shop)
     .maybeSingle();
 
@@ -81,10 +81,14 @@ export async function POST(request: NextRequest) {
     ? `${order.customer.first_name ?? ""} ${order.customer.last_name ?? ""}`.trim() || null
     : null;
 
+  const saleAmount = Number(order.total_price);
+  const commissionRate = Number(tenant.commission_rate ?? 15) / 100;
+
   const { error } = await admin.from("sales").insert({
     tenant_id: tenant.id,
     seller_id: profile.id,
-    amount: Number(order.total_price),
+    amount: saleAmount,
+    commission_amt: Math.round(saleAmount * commissionRate * 100) / 100,
     referral_code: referralCode,
     customer_name: customerName,
     notes: `Shopify order #${order.id}`,
