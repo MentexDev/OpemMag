@@ -122,14 +122,16 @@ export default async function AmbassadorDashboardPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={tenant.logo_url} alt={tenant.name} className="h-7 w-auto object-contain" />
             ) : (
-              <div
-                className="h-7 w-7 rounded-md flex items-center justify-center text-white font-bold text-xs"
-                style={{ backgroundColor: tenant.primary_color }}
-              >
-                {tenant.name[0].toUpperCase()}
-              </div>
+              <>
+                <div
+                  className="h-7 w-7 rounded-md flex items-center justify-center text-white font-bold text-xs"
+                  style={{ backgroundColor: tenant.primary_color }}
+                >
+                  {tenant.name[0].toUpperCase()}
+                </div>
+                <span className="font-semibold text-sm">{tenant.name}</span>
+              </>
             )}
-            <span className="font-semibold text-sm">{tenant.name}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground hidden sm:block">
