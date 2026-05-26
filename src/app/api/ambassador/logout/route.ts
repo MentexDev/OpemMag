@@ -7,5 +7,5 @@ export async function POST(request: NextRequest) {
   const slug = request.nextUrl.searchParams.get("slug") ?? "";
   const supabase = await createClient();
   await supabase.auth.signOut();
-  return NextResponse.redirect(new URL(`/t/${slug}/login`, request.url));
+  return NextResponse.redirect(new URL(`/t/${slug}`, request.url));
 }
