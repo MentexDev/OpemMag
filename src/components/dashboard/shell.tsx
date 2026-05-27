@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   ClipboardCheck,
+  BookOpen,
 } from "lucide-react";
 import { useState } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -41,6 +42,7 @@ const navItems = [
   { href: "/dashboard", label: "Panel", icon: LayoutDashboard },
   { href: "/dashboard/embajadoras", label: "Embajadoras", icon: Users },
   { href: "/dashboard/aprobaciones", label: "Aprobaciones", icon: ClipboardCheck },
+  { href: "/dashboard/revista", label: "Mi Revista", icon: BookOpen },
   { href: "/dashboard/ventas", label: "Ventas", icon: ShoppingBag },
   { href: "/dashboard/comisiones", label: "Comisiones", icon: DollarSign },
   { href: "/dashboard/ranking", label: "Ranking", icon: Trophy },

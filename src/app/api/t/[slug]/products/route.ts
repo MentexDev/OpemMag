@@ -13,7 +13,7 @@ export async function GET(
 
   const { data: tenant } = await admin
     .from("tenants")
-    .select("id, shopify_domain, shopify_token, is_active")
+    .select("id, shopify_domain, shopify_token, is_active, catalog_product_ids")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -25,12 +25,19 @@ export async function GET(
     return NextResponse.json({ products: [], shopifyConfigured: false });
   }
 
-  const products = await fetchTenantProducts({
+  let products = await fetchTenantProducts({
     domain: tenant.shopify_domain,
     encryptedToken: tenant.shopify_token,
   });
 
-  // Filter by IDs if provided
+  // Apply tenant's curated catalog selection if set
+  const catalogIds = tenant.catalog_product_ids as string[] | null;
+  if (catalogIds && catalogIds.length > 0) {
+    const catalogSet = new Set(catalogIds);
+    products = products.filter(p => catalogSet.has(String(p.id)));
+  }
+
+  // Filter by explicit IDs param (ambassador personal selection)
   const idsParam = request.nextUrl.searchParams.get("ids");
   if (idsParam) {
     const ids = idsParam.split(",").map(s => s.trim()).filter(Boolean);
