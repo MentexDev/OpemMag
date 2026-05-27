@@ -13,6 +13,15 @@ export const metadata: Metadata = {
   title: "OpenMag — Programa de embajadoras para tu tienda",
   description:
     "Lanza tu propio programa de afiliadas con tu marca, dominio y branding. Potenciado por OpenMag.",
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon-32x32.png",
+  },
 };
 
 export default function RootLayout({
