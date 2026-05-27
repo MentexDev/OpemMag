@@ -49,7 +49,7 @@ export async function GET() {
       .select("catalog_product_ids")
       .eq("id", tenantId)
       .maybeSingle()
-      .then(r => r.data),
+      .then((r: { data: { catalog_product_ids: string[] | null } | null }) => r.data),
   ]);
 
   const selected: string[] = (catalogRow?.catalog_product_ids as string[] | null) ?? [];
