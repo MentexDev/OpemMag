@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { sendAmbassadorApproved, sendAmbassadorRejected } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -119,6 +120,30 @@ export async function PATCH(request: NextRequest) {
     .eq("tenant_id", tenantId);
 
   if (pError) return NextResponse.json({ error: pError.message }, { status: 500 });
+
+  // Send email notification (fire-and-forget, don't block response)
+  try {
+    const [{ data: authUser }, { data: profile }, { data: tenant }] = await Promise.all([
+      admin.auth.admin.getUserById(user_id),
+      admin.from("profiles").select("full_name").eq("id", user_id).eq("tenant_id", tenantId).maybeSingle(),
+      admin.from("tenants").select("name, slug").eq("id", tenantId).maybeSingle(),
+    ]);
+
+    const email = authUser?.user?.email;
+    const name = (profile as { full_name?: string } | null)?.full_name ?? "Embajadora";
+    const tenantName = (tenant as { name?: string; slug?: string } | null)?.name ?? "";
+    const tenantSlug = (tenant as { name?: string; slug?: string } | null)?.slug ?? "";
+
+    if (email && tenantName) {
+      if (action === "approve") {
+        await sendAmbassadorApproved({ to: email, ambassadorName: name, tenantName, tenantSlug });
+      } else {
+        await sendAmbassadorRejected({ to: email, ambassadorName: name, tenantName });
+      }
+    }
+  } catch {
+    // Email failure doesn't affect the approval action
+  }
 
   return NextResponse.json({ ok: true });
 }

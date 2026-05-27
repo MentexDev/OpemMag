@@ -28,7 +28,7 @@ export async function GET() {
   // Query 1: ambassador memberships
   const { data: members } = await admin
     .from("tenant_users")
-    .select("user_id, created_at, status")
+    .select("user_id, created_at, status, commission_rate")
     .eq("tenant_id", tenantId)
     .eq("role", "ambassador")
     .order("created_at", { ascending: false });
@@ -37,7 +37,7 @@ export async function GET() {
     return NextResponse.json({ ambassadors: [] });
   }
 
-  type MemberRow = { user_id: string; created_at: string; status: string };
+  type MemberRow = { user_id: string; created_at: string; status: string; commission_rate: number | null };
   const membersArr = members as MemberRow[];
   const userIds = membersArr.map((m) => m.user_id);
 
@@ -80,6 +80,7 @@ export async function GET() {
       phone: p?.phone ?? "",
       city: p?.city ?? "",
       joined_at: m.created_at,
+      commission_rate: m.commission_rate ?? null,
     };
   });
 
@@ -94,15 +95,60 @@ export async function PATCH(request: NextRequest) {
   const tenantId = await getTenantId(user.id);
   if (!tenantId) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
 
-  const { user_id, is_active } = await request.json();
+  const body = await request.json();
   const admin = createAdminClient();
 
+  // Update commission_rate on tenant_users
+  if (body.commission_rate !== undefined) {
+    const rate = body.commission_rate === null ? null : Number(body.commission_rate);
+    const { error } = await admin
+      .from("tenant_users")
+      .update({ commission_rate: rate })
+      .eq("tenant_id", tenantId)
+      .eq("user_id", body.user_id);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
+  // Update is_active on profiles
   const { error } = await admin
     .from("profiles")
-    .update({ is_active })
-    .eq("id", user_id)
+    .update({ is_active: body.is_active })
+    .eq("id", body.user_id)
     .eq("tenant_id", tenantId);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true });
+}
+
+export async function DELETE(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const tenantId = await getTenantId(user.id);
+  if (!tenantId) return NextResponse.json({ error: "Tenant not found" }, { status: 404 });
+
+  const { user_id } = await request.json();
+  if (!user_id) return NextResponse.json({ error: "Falta user_id" }, { status: 400 });
+
+  const admin = createAdminClient();
+
+  // Remove from tenant_users (removes them from the program)
+  const { error: tuError } = await admin
+    .from("tenant_users")
+    .delete()
+    .eq("tenant_id", tenantId)
+    .eq("user_id", user_id);
+
+  if (tuError) return NextResponse.json({ error: tuError.message }, { status: 500 });
+
+  // Deactivate profile for this tenant
+  await admin
+    .from("profiles")
+    .update({ is_active: false })
+    .eq("id", user_id)
+    .eq("tenant_id", tenantId);
+
   return NextResponse.json({ ok: true });
 }

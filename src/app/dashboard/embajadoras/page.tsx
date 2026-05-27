@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { Loader2, Search, Copy, Check, MoreVertical, Users } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Loader2, Search, Copy, Check, Users, Trash2, X, Percent } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface Ambassador {
@@ -15,6 +16,145 @@ interface Ambassador {
   phone: string;
   city: string;
   joined_at: string;
+  commission_rate: number | null;
+}
+
+function DeleteConfirmModal({
+  ambassador,
+  onConfirm,
+  onCancel,
+  loading,
+}: {
+  ambassador: Ambassador;
+  onConfirm: () => void;
+  onCancel: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
+      <div className="relative bg-background border rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="h-10 w-10 rounded-full bg-destructive/15 flex items-center justify-center flex-shrink-0">
+            <Trash2 className="h-5 w-5 text-destructive" />
+          </div>
+          <button onClick={onCancel} className="rounded-lg p-1 hover:bg-muted transition-colors">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="space-y-1">
+          <p className="font-semibold">¿Eliminar embajadora?</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Vas a eliminar a <span className="font-medium text-foreground">{ambassador.full_name || ambassador.email}</span> del programa. Esta acción <span className="font-medium text-destructive">no se puede deshacer</span> y perderás todo el historial de esta embajadora.
+          </p>
+        </div>
+        <div className="flex gap-2 pt-1">
+          <Button variant="outline" className="flex-1" onClick={onCancel} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button variant="destructive" className="flex-1" onClick={onConfirm} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
+            Sí, eliminar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CommissionCell({
+  ambassador,
+  tenantDefault,
+  onSave,
+}: {
+  ambassador: Ambassador;
+  tenantDefault: number;
+  onSave: (user_id: string, rate: number | null) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(
+    ambassador.commission_rate !== null ? String(ambassador.commission_rate) : ""
+  );
+  const [saving, setSaving] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleOpen() {
+    setValue(ambassador.commission_rate !== null ? String(ambassador.commission_rate) : "");
+    setEditing(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    const parsed = value.trim() === "" ? null : parseFloat(value);
+    if (parsed !== null && (isNaN(parsed) || parsed < 0 || parsed > 100)) {
+      setSaving(false);
+      return;
+    }
+    await onSave(ambassador.user_id, parsed);
+    setSaving(false);
+    setEditing(false);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") setEditing(false);
+  }
+
+  const displayRate = ambassador.commission_rate !== null ? ambassador.commission_rate : tenantDefault;
+  const isCustom = ambassador.commission_rate !== null;
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1">
+        <div className="relative w-24">
+          <input
+            ref={inputRef}
+            type="number"
+            min="0"
+            max="100"
+            step="0.5"
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={String(tenantDefault)}
+            className="w-full text-xs border rounded-md px-2 py-1 pr-6 bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">%</span>
+        </div>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="p-1 rounded hover:bg-green-500/10 text-green-600 transition-colors"
+        >
+          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+        </button>
+        <button
+          onClick={() => setEditing(false)}
+          className="p-1 rounded hover:bg-muted text-muted-foreground transition-colors"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleOpen}
+      className={cn(
+        "inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors",
+        isCustom
+          ? "bg-primary/10 text-primary hover:bg-primary/20 font-medium"
+          : "bg-muted text-muted-foreground hover:bg-muted/70"
+      )}
+      title={isCustom ? "Comisión personalizada. Haz clic para editar" : "Usando comisión por defecto. Haz clic para personalizar"}
+    >
+      <Percent className="h-3 w-3" />
+      {displayRate}%
+      {!isCustom && <span className="text-[9px] opacity-60 ml-0.5">default</span>}
+    </button>
+  );
 }
 
 export default function EmbajadorasPage() {
@@ -23,20 +163,28 @@ export default function EmbajadorasPage() {
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Ambassador | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [tenantDefault, setTenantDefault] = useState(15);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await fetch("/api/dashboard/embajadoras");
-    if (res.ok) {
-      const { ambassadors } = await res.json();
+    const [embRes, tenantRes] = await Promise.all([
+      fetch("/api/dashboard/embajadoras"),
+      fetch("/api/tenant/me"),
+    ]);
+    if (embRes.ok) {
+      const { ambassadors } = await embRes.json();
       setAmbassadors(ambassadors);
+    }
+    if (tenantRes.ok) {
+      const { tenant } = await tenantRes.json();
+      setTenantDefault(tenant?.commission_rate ?? 15);
     }
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
 
   async function toggleActive(user_id: string, current: boolean) {
     setUpdating(user_id);
@@ -49,6 +197,32 @@ export default function EmbajadorasPage() {
       arr.map(a => (a.user_id === user_id ? { ...a, is_active: !current } : a))
     );
     setUpdating(null);
+  }
+
+  async function saveCommission(user_id: string, rate: number | null) {
+    await fetch("/api/dashboard/embajadoras", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id, commission_rate: rate }),
+    });
+    setAmbassadors(arr =>
+      arr.map(a => (a.user_id === user_id ? { ...a, commission_rate: rate } : a))
+    );
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    const res = await fetch("/api/dashboard/embajadoras", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: deleteTarget.user_id }),
+    });
+    setDeleting(false);
+    if (res.ok) {
+      setAmbassadors(arr => arr.filter(a => a.user_id !== deleteTarget.user_id));
+      setDeleteTarget(null);
+    }
   }
 
   function copyCode(code: string) {
@@ -70,6 +244,15 @@ export default function EmbajadorasPage() {
 
   return (
     <div className="space-y-6">
+      {deleteTarget && (
+        <DeleteConfirmModal
+          ambassador={deleteTarget}
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteTarget(null)}
+          loading={deleting}
+        />
+      )}
+
       <div>
         <h1 className="text-2xl font-bold">Embajadoras</h1>
         <p className="text-muted-foreground text-sm mt-1">
@@ -111,6 +294,7 @@ export default function EmbajadorasPage() {
                   <th className="px-4 py-3 font-medium">Embajadora</th>
                   <th className="px-4 py-3 font-medium hidden md:table-cell">Código</th>
                   <th className="px-4 py-3 font-medium hidden lg:table-cell">Ciudad</th>
+                  <th className="px-4 py-3 font-medium hidden sm:table-cell">Comisión</th>
                   <th className="px-4 py-3 font-medium">Estado</th>
                   <th className="px-4 py-3 font-medium text-right">Acciones</th>
                 </tr>
@@ -145,6 +329,13 @@ export default function EmbajadorasPage() {
                     <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">
                       {a.city || "—"}
                     </td>
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      <CommissionCell
+                        ambassador={a}
+                        tenantDefault={tenantDefault}
+                        onSave={saveCommission}
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <Badge
                         variant={a.is_active ? "default" : "secondary"}
@@ -158,25 +349,30 @@ export default function EmbajadorasPage() {
                         {a.is_active ? "Activa" : "Inactiva"}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={() => toggleActive(a.user_id, a.is_active)}
-                        disabled={updating === a.user_id}
-                        className={cn(
-                          "text-xs font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50",
-                          a.is_active
-                            ? "text-destructive hover:bg-destructive/10"
-                            : "text-green-600 dark:text-green-400 hover:bg-green-500/10"
-                        )}
-                      >
-                        {updating === a.user_id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin inline" />
-                        ) : a.is_active ? (
-                          "Desactivar"
-                        ) : (
-                          "Activar"
-                        )}
-                      </button>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => toggleActive(a.user_id, a.is_active)}
+                          disabled={updating === a.user_id}
+                          className={cn(
+                            "text-xs font-medium px-3 py-1.5 rounded-md transition-colors disabled:opacity-50",
+                            a.is_active
+                              ? "text-destructive hover:bg-destructive/10"
+                              : "text-green-600 dark:text-green-400 hover:bg-green-500/10"
+                          )}
+                        >
+                          {updating === a.user_id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin inline" />
+                          ) : a.is_active ? "Desactivar" : "Activar"}
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(a)}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                          title="Eliminar embajadora"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -193,13 +389,7 @@ function StatCard({ label, value, accent, muted }: { label: string; value: numbe
   return (
     <div className="rounded-xl border bg-card p-4">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p
-        className={cn(
-          "text-2xl font-bold mt-1",
-          accent && "text-green-600 dark:text-green-400",
-          muted && "text-muted-foreground"
-        )}
-      >
+      <p className={cn("text-2xl font-bold mt-1", accent && "text-green-600 dark:text-green-400", muted && "text-muted-foreground")}>
         {value}
       </p>
     </div>
@@ -216,9 +406,7 @@ function EmptyState({ search }: { search: boolean }) {
         {search ? "Sin resultados" : "Aún no tienes embajadoras"}
       </p>
       <p className="text-sm text-muted-foreground mt-1">
-        {search
-          ? "Prueba con otro término de búsqueda."
-          : "Comparte el link de tu portal para que se registren."}
+        {search ? "Prueba con otro término de búsqueda." : "Comparte el link de tu portal para que se registren."}
       </p>
     </div>
   );
