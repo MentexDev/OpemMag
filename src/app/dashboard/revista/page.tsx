@@ -10,6 +10,7 @@ import {
   Save,
   RefreshCw,
 } from "lucide-react";
+import { shopifyImageUrl } from "@/lib/shopify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -227,9 +228,10 @@ export default function RevistaPage() {
                       {img ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={img}
+                          src={shopifyImageUrl(img, 480, 640)}
                           alt={p.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

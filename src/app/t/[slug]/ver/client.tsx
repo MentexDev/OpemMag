@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { Loader2, ShoppingBag, Search, Share2, ExternalLink, X } from "lucide-react";
+import { shopifyImageUrl } from "@/lib/shopify";
 
 interface Tenant {
   id: string;
@@ -211,9 +212,10 @@ export default function RevistaClient({ tenant, ids, refCode }: Props) {
                       {img ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={img}
+                          src={shopifyImageUrl(img, 480, 640)}
                           alt={p.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
@@ -292,7 +294,7 @@ export default function RevistaClient({ tenant, ids, refCode }: Props) {
             <div className="flex items-center gap-3 px-5 py-4 border-b">
               {shareProduct.images?.[0]?.src && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={shareProduct.images[0].src} alt={shareProduct.title}
+                <img src={shopifyImageUrl(shareProduct.images[0].src, 150, 200)} alt={shareProduct.title}
                   className="h-14 w-14 rounded-lg object-cover flex-shrink-0 border" />
               )}
               <div className="min-w-0">

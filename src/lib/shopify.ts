@@ -1,5 +1,16 @@
 import { decrypt } from "./crypto";
 
+export function shopifyImageUrl(src: string, width: number, height?: number): string {
+  if (!src) return src;
+  const [base, params] = src.split("?");
+  const lastDot = base.lastIndexOf(".");
+  if (lastDot === -1) return src;
+  const size = height ? `_${width}x${height}` : `_${width}x`;
+  const sized = base.substring(0, lastDot) + size + base.substring(lastDot);
+  const query = params ? `?${params}&format=webp` : "?format=webp";
+  return sized + query;
+}
+
 export interface ShopifyProduct {
   id: number;
   title: string;
