@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentTenantAdmin } from "@/lib/auth/current-tenant";
 import { createAdminClient } from "@/lib/supabase/server";
 import { normalizeShopDomain } from "@/lib/shopify-oauth";
+import { encrypt } from "@/lib/crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     .from("tenants")
     .update({
       shopify_domain: normalizedShop,
-      shopify_token: token,
+      shopify_token: encrypt(token),
       updated_at: new Date().toISOString(),
     })
     .eq("id", ctx.tenant.id);
