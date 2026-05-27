@@ -27,7 +27,7 @@ async function resolveCustomDomain(host: string): Promise<string | null> {
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const hostname = request.headers.get("host") ?? "";
   const host = hostname.replace(/:.*/, "");
