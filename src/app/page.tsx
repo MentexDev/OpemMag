@@ -139,8 +139,8 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-16">
             <div className="flex-1">
-              <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-                OpenMag
+              <span className="font-bold text-xl tracking-tight">
+                <span className="text-white">Open</span><span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Mag</span>
               </span>
             </div>
 
@@ -414,8 +414,8 @@ export default function LandingPage() {
       <footer className="border-t border-neutral-100 dark:border-white/5 py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="font-bold text-lg bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-              OpenMag
+            <span className="font-bold text-lg">
+              <span className="text-white">Open</span><span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Mag</span>
             </span>
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((s) => (
