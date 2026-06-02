@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { fetchTenantProducts } from "@/lib/shopify";
+import { fetchTenantProducts, shopifyImageUrl } from "@/lib/shopify";
 import { ShoppingBag, TrendingUp, DollarSign, Star } from "lucide-react";
 import Link from "next/link";
 
@@ -129,9 +129,10 @@ export default async function AmbassadorDashboardPage({
                         {p.images?.[0]?.src ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
-                            src={p.images[0].src}
+                            src={shopifyImageUrl(p.images[0].src, 80, 80)}
                             alt={p.title}
                             className="h-full w-full object-cover"
+                            loading="lazy"
                           />
                         ) : (
                           <ShoppingBag className="h-4 w-4 m-3 text-white/20" />
