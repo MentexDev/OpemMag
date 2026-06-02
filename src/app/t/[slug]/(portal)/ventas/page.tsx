@@ -53,7 +53,6 @@ export default async function AmbassadorVentasPage({
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Mis Ventas</h1>
-        <p className="text-sm text-white/40 mt-0.5">Historial de ventas y comisiones</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

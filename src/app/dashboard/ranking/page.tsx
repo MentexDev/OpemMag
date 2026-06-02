@@ -37,9 +37,6 @@ export default function RankingPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Ranking</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Embajadoras ordenadas por volumen de ventas.
-        </p>
       </div>
 
       <div className="rounded-xl border bg-card overflow-hidden">

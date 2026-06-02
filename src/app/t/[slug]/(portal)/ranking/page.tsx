@@ -52,7 +52,6 @@ export default async function AmbassadorRankingPage({
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Ranking</h1>
-        <p className="text-sm text-white/40 mt-0.5">Top embajadoras del programa</p>
       </div>
 
       {/* Mi posición */}

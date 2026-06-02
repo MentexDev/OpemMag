@@ -70,7 +70,6 @@ export default function MisRevistasClient({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Mis Revistas</h1>
-          <p className="text-sm text-white/40 mt-0.5">Tus catálogos personalizados para compartir</p>
         </div>
         <a
           href="/revista"

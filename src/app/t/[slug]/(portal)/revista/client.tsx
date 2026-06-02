@@ -94,7 +94,6 @@ export default function RevistaPortalClient({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-white">Revista</h1>
-          <p className="text-sm text-white/40 mt-0.5">{filtered.length} productos disponibles</p>
         </div>
         {selected.size > 0 && (
           <button

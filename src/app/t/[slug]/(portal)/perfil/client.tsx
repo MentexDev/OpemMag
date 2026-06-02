@@ -128,7 +128,6 @@ export default function PerfilClient({
     <div className="space-y-6 max-w-2xl">
       <div>
         <h1 className="text-xl font-bold text-white">Mi Perfil</h1>
-        <p className="text-sm text-white/40 mt-0.5">Gestiona tu información y configuraciones</p>
       </div>
 
       {/* Tabs */}

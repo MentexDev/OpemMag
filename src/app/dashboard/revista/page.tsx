@@ -107,9 +107,6 @@ export default function RevistaPage() {
             <BookOpen className="h-5 w-5 text-primary" />
             <h1 className="text-xl font-bold">Mi Revista</h1>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Elige qué productos pueden ver tus embajadoras. Si no seleccionas ninguno se muestran todos.
-          </p>
         </div>
 
         <Button

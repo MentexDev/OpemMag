@@ -255,9 +255,6 @@ export default function EmbajadorasPage() {
 
       <div>
         <h1 className="text-2xl font-bold">Embajadoras</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Gestiona las embajadoras de tu programa.
-        </p>
       </div>
 
       {/* Stats */}

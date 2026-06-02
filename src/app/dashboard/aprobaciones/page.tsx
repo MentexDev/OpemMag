@@ -85,9 +85,6 @@ export default function AprobacionesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Aprobaciones</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Gestiona las solicitudes de ingreso al programa de embajadoras.
-        </p>
       </div>
 
       {/* Stats */}

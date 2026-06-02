@@ -86,9 +86,6 @@ export default async function AmbassadorDashboardPage({
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-white">Dashboard</h1>
-        <p className="text-sm text-white/40 mt-0.5">
-          Hola {profile?.full_name?.split(" ")[0] ?? "embajadora"}, aquí está tu resumen
-        </p>
       </div>
 
       {/* Stats */}

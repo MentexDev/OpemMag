@@ -106,9 +106,6 @@ export default function ConfiguracionPage() {
     <div className="space-y-10 max-w-2xl">
       <div>
         <h1 className="text-2xl font-bold">Configuración</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Ajusta los datos, branding y conexiones de tu tienda.
-        </p>
       </div>
 
       {/* ── Suscripción ── */}
