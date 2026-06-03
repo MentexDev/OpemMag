@@ -32,12 +32,17 @@ export default async function PortalLayout({
 
   const { data: membership } = await admin
     .from("tenant_users")
-    .select("status")
+    .select("status, role")
     .eq("tenant_id", tenant.id)
     .eq("user_id", user.id)
     .maybeSingle();
 
   if (!membership) redirect("/login");
+
+  // Admins don't use the ambassador portal
+  if (membership.role === "admin" || membership.role === "owner") {
+    redirect("/dashboard");
+  }
 
   if (membership.status === "pending") {
     return (
