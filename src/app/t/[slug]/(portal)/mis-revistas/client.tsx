@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LayoutList, Trash2, Share2, ShoppingBag, ExternalLink, X, Check } from "lucide-react";
 import { shopifyImageUrl } from "@/lib/shopify";
 import type { ShopifyProduct } from "@/lib/shopify";
@@ -22,13 +22,27 @@ interface Props {
 
 export default function MisRevistasClient({
   catalogs: initialCatalogs,
-  productMap,
+  productMap: initialProductMap,
   primaryColor,
   tenantSlug,
   refCode,
 }: Props) {
   const [catalogs, setCatalogs] = useState(initialCatalogs);
+  const [productMap, setProductMap] = useState<Record<string, ShopifyProduct>>(initialProductMap);
   const [deleteTarget, setDeleteTarget] = useState<Catalog | null>(null);
+
+  useEffect(() => {
+    if (Object.keys(initialProductMap).length === 0) {
+      fetch(`/api/t/${tenantSlug}/products`)
+        .then((r) => r.json())
+        .then((d) => {
+          const map: Record<string, ShopifyProduct> = {};
+          for (const p of (d.products ?? []) as ShopifyProduct[]) map[String(p.id)] = p;
+          setProductMap(map);
+        })
+        .catch(() => {});
+    }
+  }, [tenantSlug, initialProductMap]);
   const [deleting, setDeleting] = useState(false);
   const [shareTarget, setShareTarget] = useState<Catalog | null>(null);
   const [copied, setCopied] = useState(false);

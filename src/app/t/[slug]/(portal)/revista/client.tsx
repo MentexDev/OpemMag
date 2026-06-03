@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, ShoppingBag, Share2, Eye, X, Check, LayoutGrid, List, ChevronLeft, ChevronRight, Link2, ExternalLink } from "lucide-react";
 import { shopifyImageUrl } from "@/lib/shopify";
 import type { ShopifyProduct } from "@/lib/shopify";
@@ -31,13 +31,25 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 ];
 
 export default function RevistaPortalClient({
-  products,
+  products: initialProducts,
   tenantSlug,
   primaryColor,
   refCode,
 }: Props) {
+  const [products, setProducts] = useState<ShopifyProduct[]>(initialProducts);
+  const [loadingProducts, setLoadingProducts] = useState(initialProducts.length === 0);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortKey | null>(null);
+
+  useEffect(() => {
+    if (initialProducts.length === 0) {
+      fetch(`/api/t/${tenantSlug}/products`)
+        .then((r) => r.json())
+        .then((d) => setProducts(d.products ?? []))
+        .catch(() => {})
+        .finally(() => setLoadingProducts(false));
+    }
+  }, [tenantSlug, initialProducts.length]);
   const [sizeFilter, setSizeFilter] = useState("Todas");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [shareProduct, setShareProduct] = useState<ShopifyProduct | null>(null);
@@ -282,7 +294,19 @@ export default function RevistaPortalClient({
       )}
 
       {/* Products */}
-      {processed.length === 0 ? (
+      {loadingProducts ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="rounded-2xl overflow-hidden border border-white/8 bg-white/3 animate-pulse">
+              <div className="aspect-[3/4] bg-white/5" />
+              <div className="p-2.5 space-y-2">
+                <div className="h-3 bg-white/5 rounded w-3/4" />
+                <div className="h-3 bg-white/5 rounded w-1/3" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : processed.length === 0 ? (
         <div className="py-16 text-center">
           <ShoppingBag className="h-8 w-8 text-white/20 mx-auto mb-3" />
           <p className="text-sm text-white/40">Sin productos{search ? ` para "${search}"` : ""}.</p>
