@@ -25,10 +25,13 @@ export async function GET(
     return NextResponse.json({ products: [], shopifyConfigured: false });
   }
 
+  const limitParam = request.nextUrl.searchParams.get("limit");
+  const limit = limitParam ? Math.min(parseInt(limitParam), 250) : 250;
+
   let products = await fetchTenantProducts({
     domain: tenant.shopify_domain,
     encryptedToken: tenant.shopify_token,
-  });
+  }, { limit });
 
   // Apply tenant's curated catalog selection if set
   const catalogIds = tenant.catalog_product_ids as string[] | null;

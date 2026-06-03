@@ -18,7 +18,6 @@ interface Tenant {
 
 interface Props {
   tenant: Tenant;
-  products: ShopifyProduct[];
   ambassadorCount: number;
 }
 
@@ -101,10 +100,18 @@ function ProductCarousel({ products, primary }: { products: ShopifyProduct[]; pr
 }
 
 /* ─── Main Landing ─── */
-export default function TenantLandingClient({ tenant, products, ambassadorCount }: Props) {
+export default function TenantLandingClient({ tenant, ambassadorCount }: Props) {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [products, setProducts] = useState<ShopifyProduct[]>([]);
   const primary = hex(tenant.primary_color);
+
+  useEffect(() => {
+    fetch(`/api/t/${tenant.slug}/products?limit=6`)
+      .then((r) => r.json())
+      .then((d) => setProducts(d.products ?? []))
+      .catch(() => {});
+  }, [tenant.slug]);
   const name = tenant.name;
 
   useEffect(() => {
