@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { fetchTenantProducts, shopifyImageUrl } from "@/lib/shopify";
+import { fetchTenantProducts } from "@/lib/shopify";
 import { ShoppingBag, TrendingUp, DollarSign, Star } from "lucide-react";
-import Link from "next/link";
+import DashboardProductsSection from "./client";
 
 export const dynamic = "force-dynamic";
 
@@ -52,16 +52,16 @@ export default async function AmbassadorDashboardPage({
     .reduce((s, r) => s + Number(r.commission_amt), 0);
 
   // Shopify products
-  let products: { id: number; title: string; handle: string; product_type?: string; images: { src: string }[]; variants: { price: string }[]; created_at?: string }[] = [];
+  let products: import("@/lib/shopify").ShopifyProduct[] = [];
   if (tenant.shopify_domain && tenant.shopify_token) {
     const all = await fetchTenantProducts({
       domain: tenant.shopify_domain as string,
       encryptedToken: tenant.shopify_token as string,
     });
     const catalogIds = tenant.catalog_product_ids as string[] | null;
-    products = (catalogIds && catalogIds.length > 0
+    products = catalogIds && catalogIds.length > 0
       ? all.filter((p) => catalogIds.includes(String(p.id)))
-      : all) as typeof products;
+      : all;
   }
 
   const now = Date.now();
@@ -71,7 +71,6 @@ export default async function AmbassadorDashboardPage({
     return now - new Date(p.created_at).getTime() < week;
   }).length;
 
-  const recentProducts = products.slice(0, 8);
   const primary = (tenant as { primary_color: string }).primary_color;
 
   const stats = [
@@ -102,61 +101,13 @@ export default async function AmbassadorDashboardPage({
         ))}
       </div>
 
-      {/* Recent products */}
-      {recentProducts.length > 0 && (
-        <div className="rounded-xl bg-white/5 border border-white/8 overflow-hidden">
-          <div className="px-5 py-4 border-b border-white/8 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-white">Productos Recientes</h2>
-            <Link href="/revista" className="text-xs font-medium" style={{ color: primary }}>
-              Ver revista →
-            </Link>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b border-white/5">
-                <tr className="text-left text-[10px] uppercase tracking-wider text-white/30">
-                  <th className="px-5 py-3 font-medium">Imagen</th>
-                  <th className="px-5 py-3 font-medium">Nombre</th>
-                  <th className="px-5 py-3 font-medium hidden md:table-cell">Tipo</th>
-                  <th className="px-5 py-3 font-medium text-right">Precio</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {recentProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-white/3 transition-colors">
-                    <td className="px-5 py-3">
-                      <div className="h-10 w-10 rounded-lg overflow-hidden bg-white/10 flex-shrink-0">
-                        {p.images?.[0]?.src ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={shopifyImageUrl(p.images[0].src, 80, 80)}
-                            alt={p.title}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <ShoppingBag className="h-4 w-4 m-3 text-white/20" />
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-5 py-3">
-                      <p className="text-sm text-white/80 font-medium line-clamp-1 max-w-[200px]">{p.title}</p>
-                    </td>
-                    <td className="px-5 py-3 hidden md:table-cell">
-                      <p className="text-xs text-white/40">{p.product_type ?? "—"}</p>
-                    </td>
-                    <td className="px-5 py-3 text-right">
-                      <p className="text-sm font-semibold" style={{ color: primary }}>
-                        ${Number(p.variants?.[0]?.price ?? 0).toLocaleString("es-CO")}
-                      </p>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+      {/* Products with search + drawer */}
+      <DashboardProductsSection
+        products={products}
+        primaryColor={primary}
+        refCode={profile?.referral_code ?? null}
+        tenantSlug={slug}
+      />
     </div>
   );
 }

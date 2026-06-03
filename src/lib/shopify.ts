@@ -19,8 +19,20 @@ export interface ShopifyProduct {
   vendor?: string;
   product_type?: string;
   tags?: string;
-  images: { src: string; alt?: string | null }[];
-  variants: { id: number; title: string; price: string; inventory_quantity?: number }[];
+  body_html?: string;
+  created_at?: string;
+  updated_at?: string;
+  images: { id?: number; src: string; alt?: string | null }[];
+  variants: {
+    id: number;
+    title: string;
+    price: string;
+    compare_at_price?: string | null;
+    sku?: string;
+    inventory_quantity?: number;
+    option1?: string | null;
+    option2?: string | null;
+  }[];
 }
 
 export interface TenantShopify {
