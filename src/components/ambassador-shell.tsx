@@ -311,12 +311,14 @@ export default function AmbassadorShell({ tenant, profile, children }: Props) {
         )}
       >
         <Sidebar />
-        <button
-          className="absolute top-4 right-[-44px] h-9 w-9 bg-white/10 rounded-full flex items-center justify-center"
-          onClick={() => setMobileOpen(false)}
-        >
-          <X className="h-4 w-4 text-white" />
-        </button>
+        {mobileOpen && (
+          <button
+            className="absolute top-4 right-[-44px] h-9 w-9 bg-white/10 rounded-full flex items-center justify-center"
+            onClick={() => setMobileOpen(false)}
+          >
+            <X className="h-4 w-4 text-white" />
+          </button>
+        )}
       </div>
 
       {/* Main */}
