@@ -141,8 +141,8 @@ export default function RevistaPortalClient({
 
   return (
     <div className="space-y-4">
-      {/* Search + Crear */}
-      <div className="flex items-center gap-3">
+      {/* Row 1: Search + Talla + View toggle + Crear */}
+      <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
           <input
@@ -150,16 +150,47 @@ export default function RevistaPortalClient({
             placeholder="Buscar por nombre, tipo, marca o SKU..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-11 pr-4 py-3 text-sm bg-white/5 border border-white/10 rounded-full text-white placeholder:text-white/30 focus:outline-none focus:border-white/20"
+            className="w-full pl-11 pr-4 py-2.5 text-sm bg-white/5 border border-white/10 rounded-full text-white placeholder:text-white/30 focus:outline-none focus:border-white/20"
           />
         </div>
+
+        {sizes.length > 2 && (
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className="text-xs text-white/40">Talla:</span>
+            <select
+              value={sizeFilter}
+              onChange={(e) => { setSizeFilter(e.target.value); setPage(1); }}
+              className="text-xs bg-white/5 border border-white/10 rounded-lg px-2.5 py-2 text-white/70 focus:outline-none h-9"
+            >
+              {sizes.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        )}
+
+        <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5 gap-0.5 flex-shrink-0">
+          <button
+            onClick={() => setViewMode("grid")}
+            className="h-8 w-8 flex items-center justify-center rounded-md transition-all"
+            style={viewMode === "grid" ? { backgroundColor: "rgba(255,255,255,0.15)", color: "white" } : { color: "rgba(255,255,255,0.35)" }}
+          >
+            <LayoutGrid className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className="h-8 w-8 flex items-center justify-center rounded-md transition-all"
+            style={viewMode === "list" ? { backgroundColor: "rgba(255,255,255,0.15)", color: "white" } : { color: "rgba(255,255,255,0.35)" }}
+          >
+            <List className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
         {selected.size > 0 && (
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-5 py-3 rounded-full text-sm font-semibold flex-shrink-0 transition-opacity hover:opacity-90 text-white"
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold flex-shrink-0 transition-opacity hover:opacity-90"
             style={{ backgroundColor: primaryColor, color: "#000" }}
           >
-            <Link2 className="h-4 w-4" />
+            <Link2 className="h-3.5 w-3.5" />
             Crear Revista ({selected.size})
           </button>
         )}
@@ -173,55 +204,23 @@ export default function RevistaPortalClient({
         </div>
       )}
 
-      {/* Filters */}
+      {/* Row 2: Sort pills */}
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-xs text-white/40 flex-shrink-0">Ordenar:</span>
-        <div className="flex items-center gap-1.5 flex-wrap flex-1">
-          {SORT_OPTIONS.map((opt) => (
-            <button
-              key={opt.key}
-              onClick={() => { setSort(sort === opt.key ? null : opt.key); setPage(1); }}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-shrink-0"
-              style={
-                sort === opt.key
-                  ? { backgroundColor: primaryColor, color: "#000" }
-                  : { backgroundColor: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }
-              }
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {sizes.length > 2 && (
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-xs text-white/40">Talla:</span>
-            <select
-              value={sizeFilter}
-              onChange={(e) => { setSizeFilter(e.target.value); setPage(1); }}
-              className="text-xs bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-white/70 focus:outline-none"
-            >
-              {sizes.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-        )}
-
-        <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5 gap-0.5 flex-shrink-0 ml-auto">
+        {SORT_OPTIONS.map((opt) => (
           <button
-            onClick={() => setViewMode("grid")}
-            className="h-7 w-7 flex items-center justify-center rounded-md transition-all"
-            style={viewMode === "grid" ? { backgroundColor: "rgba(255,255,255,0.15)", color: "white" } : { color: "rgba(255,255,255,0.35)" }}
+            key={opt.key}
+            onClick={() => { setSort(sort === opt.key ? null : opt.key); setPage(1); }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-shrink-0"
+            style={
+              sort === opt.key
+                ? { backgroundColor: primaryColor, color: "#000" }
+                : { backgroundColor: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }
+            }
           >
-            <LayoutGrid className="h-3.5 w-3.5" />
+            {opt.label}
           </button>
-          <button
-            onClick={() => setViewMode("list")}
-            className="h-7 w-7 flex items-center justify-center rounded-md transition-all"
-            style={viewMode === "list" ? { backgroundColor: "rgba(255,255,255,0.15)", color: "white" } : { color: "rgba(255,255,255,0.35)" }}
-          >
-            <List className="h-3.5 w-3.5" />
-          </button>
-        </div>
+        ))}
       </div>
 
       {/* Select all + Pagination */}
