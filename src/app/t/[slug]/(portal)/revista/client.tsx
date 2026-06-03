@@ -141,9 +141,10 @@ export default function RevistaPortalClient({
 
   return (
     <div className="space-y-4">
-      {/* Row 1: Search + Talla + View toggle + Crear */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
+      {/* Toolbar — search full-width on mobile, everything inline on desktop */}
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Search — full width on mobile, flex-1 on desktop */}
+        <div className="relative w-full sm:flex-1 sm:w-auto sm:min-w-0">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
           <input
             type="text"
@@ -154,6 +155,24 @@ export default function RevistaPortalClient({
           />
         </div>
 
+        {/* Sort pills */}
+        <span className="text-xs text-white/40 flex-shrink-0">Ordenar:</span>
+        {SORT_OPTIONS.map((opt) => (
+          <button
+            key={opt.key}
+            onClick={() => { setSort(sort === opt.key ? null : opt.key); setPage(1); }}
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-shrink-0"
+            style={
+              sort === opt.key
+                ? { backgroundColor: primaryColor, color: "#000" }
+                : { backgroundColor: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }
+            }
+          >
+            {opt.label}
+          </button>
+        ))}
+
+        {/* Talla */}
         {sizes.length > 2 && (
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <span className="text-xs text-white/40">Talla:</span>
@@ -167,6 +186,7 @@ export default function RevistaPortalClient({
           </div>
         )}
 
+        {/* View toggle */}
         <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5 gap-0.5 flex-shrink-0">
           <button
             onClick={() => setViewMode("grid")}
@@ -184,6 +204,7 @@ export default function RevistaPortalClient({
           </button>
         </div>
 
+        {/* Crear Revista */}
         {selected.size > 0 && (
           <button
             onClick={() => setShowCreateModal(true)}
@@ -203,25 +224,6 @@ export default function RevistaPortalClient({
           <a href="/mis-revistas" className="underline">Ver Mis Revistas</a>
         </div>
       )}
-
-      {/* Row 2: Sort pills */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs text-white/40 flex-shrink-0">Ordenar:</span>
-        {SORT_OPTIONS.map((opt) => (
-          <button
-            key={opt.key}
-            onClick={() => { setSort(sort === opt.key ? null : opt.key); setPage(1); }}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex-shrink-0"
-            style={
-              sort === opt.key
-                ? { backgroundColor: primaryColor, color: "#000" }
-                : { backgroundColor: "rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.6)" }
-            }
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
 
       {/* Select all + Pagination */}
       {processed.length > 0 && (
