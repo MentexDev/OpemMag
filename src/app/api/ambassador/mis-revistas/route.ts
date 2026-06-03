@@ -8,12 +8,13 @@ async function getAmbassadorContext(userId: string) {
   const admin = createAdminClient();
   const { data } = await admin
     .from("tenant_users")
-    .select("tenant_id, status")
+    .select("tenant_id, status, role")
     .eq("user_id", userId)
-    .eq("role", "ambassador")
-    .eq("status", "approved")
     .maybeSingle();
-  return data ?? null;
+  if (!data) return { error: "Sin membresía" };
+  if (data.role !== "ambassador") return { error: `Rol inválido: ${data.role}` };
+  if (data.status !== "approved") return { error: `Estado: ${data.status}` };
+  return { tenant_id: data.tenant_id };
 }
 
 export async function POST(request: NextRequest) {
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const ctx = await getAmbassadorContext(user.id);
-  if (!ctx) return NextResponse.json({ error: "Not ambassador" }, { status: 403 });
+  if ("error" in ctx) return NextResponse.json({ error: ctx.error }, { status: 403 });
 
   const { name, product_ids } = await request.json() as { name: string; product_ids: string[] };
   if (!name?.trim() || !Array.isArray(product_ids) || product_ids.length === 0) {
