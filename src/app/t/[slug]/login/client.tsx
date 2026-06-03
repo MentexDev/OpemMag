@@ -130,7 +130,7 @@ export default function LoginClient({ slug, tenantName, logoUrl, primaryColor }:
               </div>
               <span className="text-xs text-white/50 select-none" onClick={() => setRemember(!remember)}>Recordarme</span>
             </label>
-            <Link href="/forgot-password" className="text-xs text-white/40 hover:text-white/70 transition-colors">
+            <Link href={`/forgot-password`} className="text-xs text-white/40 hover:text-white/70 transition-colors">
               ¿Olvidaste tu contraseña?
             </Link>
           </div>
